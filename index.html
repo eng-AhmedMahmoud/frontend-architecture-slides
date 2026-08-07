@@ -3,126 +3,163 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Frontend Architecture — Monolith to Micro-Frontends</title>
+<title>Frontend Architecture — Monoliths to Micro-Frontends</title>
 <style>
   :root{
-    --bg:#f5efe4; --bg2:#fffdf8; --ink:#2c2822; --muted:#7c7266; --line:#e6ddcc;
-    --a:#2f6fd6; --a2:#2e9e69; --arch:#7c4dd6; --ai:#0e8fa8; --warn:#b9770c; --red:#d1453b;
-    --code:#2b2620; --mono:"SF Mono",Menlo,Consolas,monospace;
-    --shadow:0 8px 30px rgba(90,70,40,.10);
+    --bg:#eae6db; --panel:#f4f1e8; --ink:#20242e; --ink2:#3a3d44; --muted:#6f6a5e; --line:#d8d2c2;
+    --coral:#df5b45; --olive:#6f7d3f; --plum:#8a5a6a; --ochre:#b07d1a; --teal:#3f7d74; --red:#c94b34;
+    --code:#26262a; --shadow:0 10px 30px rgba(70,55,30,.12);
+    --serif:"Iowan Old Style",Georgia,"Palatino Linotype","Book Antiqua",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box; margin:0; padding:0}
   html,body{height:100%}
-  body{background:var(--bg); color:var(--ink); font:400 24px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; overflow:hidden;
-    background-image:radial-gradient(1200px 500px at 70% -10%, rgba(124,77,214,.06), transparent), radial-gradient(900px 500px at 0% 110%, rgba(47,111,214,.06), transparent);}
-  #stage{position:fixed; inset:0; display:grid; place-items:center}
-  .slide{position:absolute; inset:0; display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:6vh 7vw; opacity:0; transition:opacity .3s}
+  body{background:var(--bg); color:var(--ink); font:400 24px/1.5 var(--sans); -webkit-font-smoothing:antialiased; overflow:hidden;
+    background-image:radial-gradient(1200px 520px at 78% -14%, rgba(223,91,69,.06), transparent), radial-gradient(900px 500px at -6% 114%, rgba(111,125,63,.07), transparent);}
+  #stage{position:fixed; inset:0}
+  .slide{position:absolute; inset:0; display:none; flex-direction:column; justify-content:center; align-items:flex-start; text-align:left; padding:7vh 9vw; opacity:0; transition:opacity .3s}
   .slide.on{display:flex; opacity:1}
   .slide .notes{display:none}
-  .kicker{color:var(--a); font-size:14px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px}
-  h1{font-size:min(6.8vw,80px); line-height:1.02; letter-spacing:-2px; font-weight:800}
-  h2{font-size:min(4.7vw,52px); line-height:1.05; letter-spacing:-1.1px; font-weight:800}
-  .sub{color:var(--muted); font-size:min(2.7vw,29px); margin-top:14px; max-width:27ch}
-  .say{color:var(--muted); font-size:min(2.25vw,24px); margin-top:14px; max-width:42ch}
-  .big{font-size:min(4.6vw,52px); font-weight:800; line-height:1.12; letter-spacing:-1px; max-width:20ch}
-  .accent{color:var(--a)} .g{color:var(--a2)} .arch{color:var(--arch)} .ai{color:var(--ai)} .w{color:var(--warn)} .r{color:var(--red)}
-  .fig{margin:20px 0 6px; width:100%; max-width:900px}
-  .row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:18px}
-  .chip{background:var(--bg2); border:1px solid var(--line); border-radius:14px; padding:14px 20px; font-size:min(2.05vw,22px); font-weight:600; box-shadow:var(--shadow)}
-  .chip small{display:block; color:var(--muted); font-weight:400; font-size:.7em; margin-top:3px}
-  .chip.a{border-color:var(--a); border-top:3px solid var(--a)} .chip.g{border-color:var(--a2); border-top:3px solid var(--a2)}
-  .chip.arch{border-color:var(--arch); border-top:3px solid var(--arch)} .chip.w{border-color:var(--warn); border-top:3px solid var(--warn)} .chip.r{border-color:var(--red); border-top:3px solid var(--red)}
-  code{background:#efe7d7; color:#5a4b34; padding:2px 7px; border-radius:6px; font:.82em var(--mono)}
-  pre{background:var(--code); color:#efe8da; border-radius:12px; padding:14px 20px; margin-top:14px; font:min(1.9vw,19px)/1.6 var(--mono); text-align:left; overflow:auto; max-width:min(92vw,860px); box-shadow:var(--shadow)}
+  .kicker{color:var(--coral); font:700 15px/1 var(--mono); letter-spacing:2px; text-transform:uppercase; margin-bottom:20px}
+  h1{font-family:var(--serif); font-size:min(8vw,96px); line-height:.98; letter-spacing:-1.5px; font-weight:800; text-wrap:balance}
+  h2{font-family:var(--serif); font-size:min(6vw,68px); line-height:1.02; letter-spacing:-1px; font-weight:800; text-wrap:balance; max-width:20ch}
+  .sub{color:var(--muted); font-size:min(2.7vw,29px); margin-top:18px; max-width:34ch; text-wrap:pretty}
+  .say{color:var(--ink2); font-size:min(2.25vw,24px); margin-top:16px; max-width:62ch; text-wrap:pretty}
+  .say b{color:var(--ink)}
+  .big{font-family:var(--serif); font-size:min(5.6vw,64px); font-weight:800; line-height:1.08; letter-spacing:-1px; max-width:22ch; text-wrap:balance}
+  .accent{color:var(--coral)} .g{color:var(--olive)} .arch{color:var(--plum)} .ai{color:var(--teal)} .w{color:var(--ochre)} .r{color:var(--red)}
+  .mono{font-family:var(--mono)}
+  .fig{margin:26px 0 6px; width:100%; max-width:900px}
+  .row{display:flex; gap:16px; justify-content:flex-start; flex-wrap:wrap; margin-top:24px}
+  .chip{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 22px; font-size:min(2.05vw,22px); font-weight:600; box-shadow:var(--shadow)}
+  .chip small{display:block; color:var(--muted); font-weight:400; font-size:.7em; margin-top:4px}
+  .chip.a{border-top:3px solid var(--coral)} .chip.g{border-top:3px solid var(--olive)}
+  .chip.arch{border-top:3px solid var(--plum)} .chip.w{border-top:3px solid var(--ochre)} .chip.r{border-top:3px solid var(--red)}
+  code{background:#e3ddcc; color:#6a4a24; padding:2px 7px; border-radius:6px; font:.82em var(--mono)}
+  pre{background:var(--code); color:#ece7d8; border-radius:12px; padding:22px 26px; margin-top:20px; font:min(1.9vw,19px)/1.8 var(--mono); text-align:left; overflow:auto; max-width:min(84vw,880px); box-shadow:var(--shadow)}
   pre code{background:none; color:inherit; padding:0}
-  .cmt{color:#9a9184} .kw{color:#e08b7d} .st{color:#8ab6e6} .fn{color:#7bc48a} .ty{color:#b79ae6}
-  .key{background:rgba(47,111,214,.09); border:1px solid rgba(47,111,214,.28); border-radius:12px; padding:12px 20px; margin-top:18px; font-size:min(2.05vw,22px); max-width:50ch}
-  .key.w{background:rgba(185,119,12,.1); border-color:rgba(185,119,12,.32)}
-  .key.g{background:rgba(46,158,105,.1); border-color:rgba(46,158,105,.3)}
-  a.link{color:var(--a); text-decoration:none; border-bottom:1px solid var(--a)}
+  .cmt{color:#8f8a79} .kw{color:#e88f78} .st{color:#c9b587} .fn{color:#9aab5f} .ty{color:#c197a8}
+  .key{background:rgba(223,91,69,.09); border-left:4px solid var(--coral); border-radius:0 12px 12px 0; padding:14px 22px; margin-top:24px; font-size:min(2.05vw,22px); max-width:58ch; text-wrap:pretty}
+  .key.w{background:rgba(176,125,26,.11); border-color:var(--ochre)}
+  .key.g{background:rgba(111,125,63,.11); border-color:var(--olive)}
+  a.link{color:var(--coral); text-decoration:none; border-bottom:1px solid var(--coral)}
   .frag{opacity:0; transform:translateY(8px); transition:opacity .35s, transform .35s}
   .frag.on{opacity:1; transform:none}
-  svg{width:100%; height:auto; display:block}
-  .lbl{fill:#8b8172; font:13px/1 -apple-system,sans-serif}
-  .lbl.b{fill:#2c2822; font-weight:700}
-  .quad g:hover rect{stroke-width:3}
-  #bar{position:fixed; left:0; top:0; height:5px; background:var(--a); width:0; transition:width .3s; z-index:10}
-  #hud{position:fixed; bottom:14px; right:18px; font-size:13px; color:var(--muted); z-index:10; display:flex; gap:12px; align-items:center; opacity:.65}
-  #hud kbd{background:var(--bg2); border:1px solid var(--line); border-radius:5px; padding:1px 6px; font:12px var(--mono)}
+  svg{width:100%; height:auto; display:block; overflow:visible}
+  .lbl{fill:#7a7364; font:13px/1 var(--sans)}
+  .lbl.b{fill:#20242e; font-weight:700}
+  /* animations */
+  .slide .draw{stroke-dasharray:1; stroke-dashoffset:1}
+  .slide.on .draw{animation:draw 1.15s ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .slide .growbar{transform:scaleX(0); transform-box:fill-box; transform-origin:left}
+  .slide.on .growbar{animation:grow .9s cubic-bezier(.35,0,.2,1) forwards}
+  @keyframes grow{to{transform:scaleX(1)}}
+  .slide .pop{transform:scale(0); transform-box:fill-box; transform-origin:center}
+  .slide.on .pop{animation:pop .55s cubic-bezier(.3,1.5,.5,1) forwards; animation-delay:.9s}
+  @keyframes pop{to{transform:scale(1)}}
+  .flow{stroke-dasharray:6 7; animation:flow 1.1s linear infinite}
+  @keyframes flow{to{stroke-dashoffset:-13}}
+  .ink{opacity:0} .slide.on .ink{animation:inkin 1.4s ease .2s forwards}
+  @keyframes inkin{to{opacity:1}}
+  .quad g{cursor:default} .quad g rect{transition:filter .2s, stroke-width .2s} .quad g:hover rect{stroke-width:3; filter:brightness(.98)}
+  .hn{transition:transform .18s, filter .18s; cursor:default; transform-box:fill-box; transform-origin:center}
+  .hn:hover{transform:translateY(-3px) scale(1.03); filter:drop-shadow(0 6px 10px rgba(70,55,30,.25))}
+  .ava{vertical-align:middle}
+  /* character sheet */
+  .cs-grid{display:grid; grid-template-columns:1.1fr 1fr 1.1fr; gap:30px; width:100%; max-width:1180px; margin-top:18px; align-items:start}
+  .cs-label{font:700 14px/1.2 var(--mono); letter-spacing:1px; text-transform:uppercase; color:var(--coral); margin:18px 0 8px}
+  .cs-label:first-child{margin-top:0}
+  .cs-val{font:600 min(2vw,22px)/1.5 var(--mono); color:var(--ink)}
+  .cs-stat{display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px; font:600 min(1.7vw,19px)/1.7 var(--mono)}
+  .cs-bar{width:120px; height:9px; border-radius:5px; background:#ddd6c4; overflow:hidden}
+  .cs-bar i{display:block; height:100%; border-radius:5px; transform-origin:left}
+  .slide.on .cs-bar i{animation:grow .9s cubic-bezier(.35,0,.2,1) forwards}
+  /* growing pains list */
+  .plist{list-style:none; margin-top:12px; max-width:30ch}
+  .plist li{font:600 min(2.4vw,26px)/1.35 var(--sans); color:var(--ink); padding:12px 0 12px 40px; position:relative}
+  .plist li::before{content:"▷"; position:absolute; left:0; top:12px; color:var(--muted); font-size:20px}
+  .plist li small{display:block; color:var(--muted); font-weight:400; font-size:.72em; margin-top:2px}
+  #bar{position:fixed; left:0; top:0; height:5px; background:var(--coral); width:0; transition:width .3s; z-index:10}
+  #hud{position:fixed; bottom:14px; right:18px; font:12px var(--mono); color:var(--muted); z-index:10; display:flex; gap:12px; align-items:center; opacity:.75}
+  #hud kbd{background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:1px 6px}
   #dots{position:fixed; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:10}
   #dots i{width:7px; height:7px; border-radius:50%; background:var(--line); transition:.2s}
-  #dots i.on{background:var(--a); width:20px; border-radius:4px}
-  #notes{position:fixed; left:0; right:0; bottom:0; max-height:46vh; overflow:auto; background:#fffdf8; border-top:2px solid var(--a); padding:16px 26px 22px; transform:translateY(101%); transition:transform .25s; z-index:20; text-align:left; box-shadow:0 -8px 30px rgba(90,70,40,.12)}
+  #dots i.on{background:var(--coral); width:20px; border-radius:4px}
+  #notes{position:fixed; left:0; right:0; bottom:0; max-height:46vh; overflow:auto; background:var(--panel); border-top:2px solid var(--coral); padding:16px 26px 22px; transform:translateY(101%); transition:transform .25s; z-index:20; text-align:left; box-shadow:0 -8px 30px rgba(70,55,30,.16)}
   #notes.show{transform:translateY(0)}
-  #notes h4{color:var(--a); font-size:13px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px}
-  #notes .t{color:var(--warn); font-weight:700; margin-bottom:6px; font-size:15px}
-  #notes p{font-size:16.5px; line-height:1.5; color:#4a4238; max-width:96ch} #notes p+p{margin-top:6px}
+  #notes h4{color:var(--coral); font:700 13px/1 var(--mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px}
+  #notes .t{color:var(--ochre); font-weight:700; margin-bottom:6px; font-size:15px}
+  #notes p{font-size:16.5px; line-height:1.5; color:#4a4638; max-width:100ch} #notes p+p{margin-top:6px}
   @media print{
     body{overflow:visible; background:#fff}
     #bar,#hud,#notes,#dots{display:none}
     #stage{position:static; display:block}
     .slide{position:static; display:flex !important; opacity:1 !important; page-break-after:always; min-height:100vh; border-bottom:1px solid #ddd}
-    .frag{opacity:1 !important; transform:none !important}
+    .frag,.ink{opacity:1 !important; transform:none !important}
+    .draw{stroke-dashoffset:0 !important} .growbar,.cs-bar i,.pop{transform:none !important}
   }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ava" viewBox="0 0 40 44"><circle cx="20" cy="13" r="9"/><path d="M4 42 a16 15 0 0 1 32 0 z"/></symbol>
+</svg>
+
 <div id="bar"></div>
 <div id="stage">
 
   <!-- 1 · TITLE -->
-  <section class="slide">
+  <section class="slide" style="justify-content:center">
     <div class="kicker">Senior Frontend Engineering</div>
-    <h1>Frontend Architecture</h1>
-    <div class="fig" style="max-width:820px">
-      <svg viewBox="0 0 820 120">
-        <g font-weight="700" font-size="17" text-anchor="middle">
-          <rect x="20" y="35" width="200" height="60" rx="12" fill="#fffdf8" stroke="#2f6fd6" stroke-width="1.5"/>
-          <text x="120" y="62" fill="#2c2822">Monolith</text><text x="120" y="82" fill="#8b8172" font-size="12" font-weight="400">one app · one deploy</text>
-          <rect x="310" y="35" width="200" height="60" rx="12" fill="#fffdf8" stroke="#7c4dd6" stroke-width="1.5"/>
-          <text x="410" y="62" fill="#2c2822">Monorepo</text><text x="410" y="82" fill="#8b8172" font-size="12" font-weight="400">many packages · one repo</text>
-          <rect x="600" y="35" width="200" height="60" rx="12" fill="#fffdf8" stroke="#2e9e69" stroke-width="1.5"/>
-          <text x="700" y="62" fill="#2c2822">Micro-Frontends</text><text x="700" y="82" fill="#8b8172" font-size="12" font-weight="400">many apps · deploy alone</text>
-          <path d="M228 65 L300 65" stroke="#b6ab98" stroke-width="2" marker-end="url(#ar)"/>
-          <path d="M518 65 L590 65" stroke="#b6ab98" stroke-width="2" marker-end="url(#ar)"/>
+    <h1>Frontend<br>Architecture</h1>
+    <p class="sub" style="max-width:40ch">Scaling one real app — <b class="mono" style="color:var(--ink)">CommerceOS</b> — from a monolith to micro-frontends, and how to choose.</p>
+    <div class="fig" style="max-width:760px; margin-top:34px">
+      <svg viewBox="0 0 760 96">
+        <g font:700 16px var(--mono); font-family="var(--mono)" font-weight="700" font-size="16" text-anchor="middle">
+          <rect x="10" y="28" width="200" height="52" rx="10" fill="#f4f1e8" stroke="#df5b45" stroke-width="1.6"/><text x="110" y="59" fill="#20242e">Monolith</text>
+          <rect x="280" y="28" width="200" height="52" rx="10" fill="#f4f1e8" stroke="#8a5a6a" stroke-width="1.6"/><text x="380" y="59" fill="#20242e">Monorepo</text>
+          <rect x="550" y="28" width="200" height="52" rx="10" fill="#f4f1e8" stroke="#6f7d3f" stroke-width="1.6"/><text x="650" y="59" fill="#20242e">Micro-Frontends</text>
+          <path class="draw" pathLength="1" d="M214 54 L276 54" stroke="#b6ac96" stroke-width="2.4" fill="none" marker-end="url(#ar)"/>
+          <path class="draw" pathLength="1" d="M484 54 L546 54" stroke="#b6ac96" stroke-width="2.4" fill="none" marker-end="url(#ar)"/>
         </g>
-        <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#b6ab98"/></marker></defs>
+        <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#b6ac96"/></marker></defs>
       </svg>
     </div>
-    <p class="sub">Scaling one real app — <b>CommerceOS</b> — three ways, and how to choose.</p>
-    <aside class="notes"><div class="t">Open</div><p>We architect frontend today, not just write it. We take one real app — a Shopify-style admin, CommerceOS — and scale it from a simple monolith all the way to micro-frontends, deciding at every step whether the added power is worth the added complexity. The common thread of the whole talk: we trade complexity for scalability.</p></aside>
+    <aside class="notes"><div class="t">Open</div><p>We architect frontend today, not just write it. One app, scaled from a simple monolith all the way to micro-frontends, deciding at every step whether the added power is worth the added complexity. The common thread: we trade complexity for scalability.</p></aside>
   </section>
 
   <!-- 2 · BIG IDEA -->
   <section class="slide">
     <div class="kicker">The big idea</div>
     <p class="big">Trade <span class="w">complexity</span> for <span class="g">scalability</span>.</p>
-    <div class="fig" style="max-width:560px">
-      <svg viewBox="0 0 560 240">
-        <line x1="60" y1="200" x2="540" y2="200" stroke="#e6ddcc"/><line x1="60" y1="30" x2="60" y2="200" stroke="#e6ddcc"/>
-        <path d="M60 190 C 220 175, 360 120, 540 55" fill="none" stroke="#2e9e69" stroke-width="3"/>
-        <path d="M60 195 C 220 190, 360 160, 540 95" fill="none" stroke="#b9770c" stroke-width="3" stroke-dasharray="2 6"/>
-        <text x="546" y="52" class="lbl b" fill="#2e9e69">scalability</text><text x="546" y="98" class="lbl" fill="#b9770c">complexity</text>
-        <text x="300" y="228" class="lbl" text-anchor="middle">team &amp; codebase growth →</text>
+    <div class="fig" style="max-width:560px; margin-top:20px">
+      <svg viewBox="0 0 560 220">
+        <line x1="50" y1="180" x2="540" y2="180" stroke="#d8d2c2"/><line x1="50" y1="20" x2="50" y2="180" stroke="#d8d2c2"/>
+        <path class="draw" pathLength="1" d="M50 170 C 210 155, 350 100, 540 40" fill="none" stroke="#6f7d3f" stroke-width="3.4"/>
+        <path class="draw" pathLength="1" d="M50 175 C 210 170, 350 140, 540 80" fill="none" stroke="#b07d1a" stroke-width="3.4" stroke-dasharray="2 6"/>
+        <text x="546" y="38" class="lbl b" fill="#6f7d3f">scalability</text><text x="546" y="82" class="lbl" fill="#b07d1a">complexity</text>
+        <text x="295" y="208" class="lbl" text-anchor="middle">team &amp; codebase growth →</text>
       </svg>
     </div>
     <p class="key">No architecture is "best." Pick the <b>least-worst</b> fit — and move up only when growing pains force it.</p>
-    <aside class="notes"><div class="t">The one sentence</div><p>If you remember one thing: every step up in scalability costs complexity. None of these architectures is better than another — each solves a specific problem and has strengths and weaknesses. Our job as architects is to find the best architecture for the scenario, and when we can't, the least-worst one.</p></aside>
+    <aside class="notes"><div class="t">The one sentence</div><p>Every step up in scalability costs complexity. Our job is to find the best architecture for the scenario, and when we can't, the least-worst one.</p></aside>
   </section>
 
   <!-- 3 · WHAT IS ARCHITECTURE -->
   <section class="slide">
     <div class="kicker">01 · Foundations</div>
-    <h2>Architecture = <span class="accent">decisions</span></h2>
-    <p class="say">"The decisions about how we organize a system to promote the qualities we want" — the ones <b>expensive to change later</b>.</p>
+    <h2>What is architecture?</h2>
+    <p class="say" style="max-width:52ch">"The decisions about how we organize a system to promote the qualities we want" — the ones <b>expensive to change later</b>.</p>
     <div class="row">
       <div class="chip frag a">Business goals</div>
       <div class="chip frag arch">Quality attributes</div>
       <div class="chip frag w">Constraints<small>team · time · money</small></div>
       <div class="chip frag g">→ decisions</div>
     </div>
-    <p class="say frag">These are your <b>architectural drivers</b>. The biggest is usually <b class="accent">team size</b>.</p>
-    <aside class="notes"><div class="t">Define it</div><p>Architecture is hard to define — integration, boundaries, extensibility, scalability all come to mind. The word Maxi uses is "decisions." Ralph Johnson: "the decisions you wish you could get right early." Michael Keeling (Design It): "the decisions about how we organize a software project to promote desired quality attributes." Those decisions come from architectural drivers: business goals, quality attributes, constraints (decisions already made for you — e.g. must deploy to AWS, or time/money), architecturally-significant requirements, team experience, and technology trends (AI). Drivers → requirements (ADRs) → decisions.</p></aside>
+    <p class="say frag" style="max-width:40ch">These are your <b>architectural drivers</b>. The biggest is usually <b class="accent">team size</b>.</p>
+    <aside class="notes"><div class="t">Define it</div><p>Ralph Johnson: "the decisions you wish you could get right early." Michael Keeling (Design It): "the decisions about how we organize a system to promote desired quality attributes." Drivers: business goals, quality attributes, constraints, significant requirements, team experience, tech trends → requirements (ADRs) → decisions.</p></aside>
   </section>
 
   <!-- 4 · 4 PILLARS -->
@@ -130,31 +167,39 @@
     <div class="kicker">01 · Foundations</div>
     <h2>Compare any architecture</h2>
     <p class="say">Four pillars — like a character sheet in an RPG.</p>
-    <div class="fig" style="max-width:560px">
-      <svg viewBox="0 0 560 210">
-        <g font-size="15" font-weight="700">
-          <text x="10" y="30" fill="#2f6fd6">Style</text><rect x="150" y="18" width="360" height="16" rx="8" fill="#ece4d4"/><rect x="150" y="18" width="300" height="16" rx="8" fill="#2f6fd6"/>
-          <text x="10" y="78" fill="#7c4dd6">Characteristics</text><rect x="150" y="66" width="360" height="16" rx="8" fill="#ece4d4"/><rect x="150" y="66" width="250" height="16" rx="8" fill="#7c4dd6"/>
-          <text x="10" y="126" fill="#2e9e69">Decisions</text><rect x="150" y="114" width="360" height="16" rx="8" fill="#ece4d4"/><rect x="150" y="114" width="330" height="16" rx="8" fill="#2e9e69"/>
-          <text x="10" y="174" fill="#b9770c">Components</text><rect x="150" y="162" width="360" height="16" rx="8" fill="#ece4d4"/><rect x="150" y="162" width="210" height="16" rx="8" fill="#b9770c"/>
+    <div class="fig" style="max-width:580px">
+      <svg viewBox="0 0 580 210">
+        <g font-size="15" font-weight="700" font-family="var(--mono)">
+          <text x="10" y="30" fill="#df5b45">STYLE</text><rect x="200" y="18" width="360" height="16" rx="8" fill="#ddd6c4"/><rect class="growbar" x="200" y="18" width="320" height="16" rx="8" fill="#df5b45" style="animation-delay:.1s"/>
+          <text x="10" y="78" fill="#8a5a6a">CHARACTERISTICS</text><rect x="200" y="66" width="360" height="16" rx="8" fill="#ddd6c4"/><rect class="growbar" x="200" y="66" width="250" height="16" rx="8" fill="#8a5a6a" style="animation-delay:.25s"/>
+          <text x="10" y="126" fill="#6f7d3f">DECISIONS</text><rect x="200" y="114" width="360" height="16" rx="8" fill="#ddd6c4"/><rect class="growbar" x="200" y="114" width="330" height="16" rx="8" fill="#6f7d3f" style="animation-delay:.4s"/>
+          <text x="10" y="174" fill="#b07d1a">COMPONENTS</text><rect x="200" y="162" width="360" height="16" rx="8" fill="#ddd6c4"/><rect class="growbar" x="200" y="162" width="210" height="16" rx="8" fill="#b07d1a" style="animation-delay:.55s"/>
         </g>
       </svg>
     </div>
-    <p class="say">Style · the "-ilities" · the rules you commit to · the building blocks.</p>
-    <aside class="notes"><div class="t">The rubric</div><p>From "Fundamentals of Software Architecture." Four pillars: architectural STYLE (the shape — monolith, monorepo, micro-frontends), CHARACTERISTICS (the quality attributes you prioritize), DECISIONS (rules, boundaries), and logical COMPONENTS (modules, screens, features). Maxi's RPG mapping: class = style, stats = characteristics, background = decisions, skills = components. Style alone names the architecture but doesn't paint the full picture — that's why all four matter. We'll give each stage a character sheet.</p></aside>
+    <aside class="notes"><div class="t">The rubric</div><p>From "Fundamentals of Software Architecture." Style (the shape), Characteristics (the -ilities), Decisions (rules/boundaries), Components (modules/screens/features). RPG mapping: class, stats, background, skills.</p></aside>
   </section>
 
-  <!-- 5 · JOURNEY -->
+  <!-- 5 · JOURNEY (avatars) -->
   <section class="slide">
     <div class="kicker">02 · The map</div>
     <h2>Architecture scales with the <span class="accent">team</span></h2>
-    <div class="row" style="margin-top:26px">
-      <div class="chip frag">1 dev<small>everything is fine</small></div>
-      <div class="chip frag w">5 devs<small>merge &amp; deploy friction</small></div>
-      <div class="chip frag r">50 devs<small>one broken build blocks everyone</small></div>
+    <div class="row" style="margin-top:30px; align-items:flex-start">
+      <div class="chip frag">
+        <svg class="ava" width="26" height="28" fill="#6f7d3f"><use href="#ava"/></svg>
+        <div style="margin-top:8px" class="mono">1 dev</div><small>everything is fine</small>
+      </div>
+      <div class="chip frag w">
+        <span style="display:inline-flex;gap:3px"><svg class="ava" width="22" height="24" fill="#b07d1a"><use href="#ava"/></svg><svg class="ava" width="22" height="24" fill="#b07d1a"><use href="#ava"/></svg><svg class="ava" width="22" height="24" fill="#b07d1a"><use href="#ava"/></svg><svg class="ava" width="22" height="24" fill="#b07d1a"><use href="#ava"/></svg><svg class="ava" width="22" height="24" fill="#b07d1a"><use href="#ava"/></svg></span>
+        <div style="margin-top:8px" class="mono">5 devs</div><small>merge &amp; deploy friction</small>
+      </div>
+      <div class="chip frag r">
+        <span style="display:inline-grid;grid-template-columns:repeat(8,1fr);gap:2px;max-width:150px"><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg><svg class="ava" width="16" height="17" fill="#c94b34"><use href="#ava"/></svg></span>
+        <div style="margin-top:8px" class="mono">50 devs</div><small>one broken build blocks everyone</small>
+      </div>
     </div>
     <p class="key w frag">Move up only when the pain forces it. Complexity you don't need is a bug.</p>
-    <aside class="notes"><div class="t">Roadmap</div><p>Every architecture pattern exists to answer a growth pain. The axis is team + codebase size. Monolith → Monorepo → Micro-frontends. Note a monorepo isn't technically a style by itself — you can do a monolith or micro-frontends with a monorepo; it just helps with the growing pains.</p></aside>
+    <aside class="notes"><div class="t">Roadmap</div><p>Every pattern answers a growth pain. Monolith → Monorepo → Micro-frontends. A monorepo isn't a style by itself.</p></aside>
   </section>
 
   <!-- 6 · COMMERCEOS + C4 -->
@@ -165,90 +210,129 @@
     <div class="fig" style="max-width:640px">
       <svg viewBox="0 0 640 150">
         <g text-anchor="middle" font-size="15" font-weight="700">
-          <rect x="10" y="20" width="620" height="110" rx="12" fill="none" stroke="#d9d0bf"/><text x="70" y="15" class="lbl b" text-anchor="start">Context</text>
-          <rect x="30" y="40" width="580" height="80" rx="10" fill="none" stroke="#d9d0bf"/><text x="98" y="36" class="lbl" text-anchor="start">Container</text>
-          <rect x="55" y="58" width="170" height="46" rx="8" fill="#fffdf8" stroke="#2f6fd6"/><text x="140" y="86" fill="#2c2822" font-size="13">Admin SPA</text>
-          <rect x="245" y="58" width="150" height="46" rx="8" fill="#fffdf8" stroke="#d9d0bf"/><text x="320" y="86" fill="#7c7266" font-size="13">Core API</text>
-          <rect x="415" y="58" width="150" height="46" rx="8" fill="#fffdf8" stroke="#d9d0bf"/><text x="490" y="86" fill="#7c7266" font-size="13">Database</text>
-          <path d="M225 81 L243 81" stroke="#b6ab98" stroke-width="2"/><path d="M395 81 L413 81" stroke="#b6ab98" stroke-width="2"/>
+          <rect x="10" y="20" width="620" height="110" rx="12" fill="none" stroke="#cfc7b3"/><text x="70" y="15" class="lbl b" text-anchor="start">Context</text>
+          <rect x="30" y="40" width="580" height="80" rx="10" fill="none" stroke="#cfc7b3"/><text x="98" y="36" class="lbl" text-anchor="start">Container</text>
+          <rect x="55" y="58" width="170" height="46" rx="8" fill="#f4f1e8" stroke="#df5b45"/><text x="140" y="86" fill="#20242e" font-size="13">Admin SPA</text>
+          <rect x="245" y="58" width="150" height="46" rx="8" fill="#f4f1e8" stroke="#cfc7b3"/><text x="320" y="86" fill="#6f6a5e" font-size="13">Core API</text>
+          <rect x="415" y="58" width="150" height="46" rx="8" fill="#f4f1e8" stroke="#cfc7b3"/><text x="490" y="86" fill="#6f6a5e" font-size="13">Database</text>
+          <path class="draw" pathLength="1" d="M225 81 L243 81" stroke="#b6ac96" stroke-width="2" fill="none"/><path class="draw" pathLength="1" d="M395 81 L413 81" stroke="#b6ac96" stroke-width="2" fill="none"/>
         </g>
       </svg>
     </div>
     <p class="say">We build the <b>Admin SPA</b> — React · TanStack · Vite.</p>
-    <aside class="notes"><div class="t">Ground it</div><p>CommerceOS, a fictitious e-commerce platform, mini-Shopify. V1: a startup, a handful of engineers → monolith. C4 (c4model.com) gives four zoom levels. Level 1 Context: systems + users, no software yet — great for non-technical people. Level 2 Container: expand the admin system to a React SPA + Core API + Database. We focus only on the admin web app.</p></aside>
+    <aside class="notes"><div class="t">Ground it</div><p>V1: a startup, a handful of engineers → monolith. C4 four zoom levels: Context (systems + users, share with non-devs), Container (React SPA + Core API + Database). We focus on the admin web app.</p></aside>
   </section>
 
-  <!-- 7 · MONOLITH -->
+  <!-- 7 · CHARACTER SHEET (course-vibe) -->
   <section class="slide">
-    <div class="kicker">03 · Stage 1</div>
-    <h2>Start with a monolith</h2>
-    <div class="fig" style="max-width:360px">
-      <svg viewBox="0 0 360 120">
-        <rect x="80" y="20" width="200" height="80" rx="14" fill="#fffdf8" stroke="#2e9e69" stroke-width="2"/>
-        <text x="180" y="58" text-anchor="middle" fill="#2c2822" font-weight="700" font-size="17">one app</text>
-        <text x="180" y="80" text-anchor="middle" fill="#7c7266" font-size="13">one build · one deploy</text>
-      </svg>
+    <div class="kicker">03 · Stage 1 · Monoliths</div>
+    <h2 style="font-size:min(6.4vw,74px)">Character Sheet</h2>
+    <div class="cs-grid">
+      <div class="cs-col">
+        <div class="cs-label">Architectural Style</div>
+        <div class="cs-val">Monolithic SPA</div>
+        <div class="cs-label">Architectural Characteristics</div>
+        <div class="cs-stat">Simplicity <span class="cs-bar"><i style="width:100%;background:#6f7d3f;animation-delay:.1s"></i></span></div>
+        <div class="cs-stat">Deployability <span class="cs-bar"><i style="width:100%;background:#6f7d3f;animation-delay:.2s"></i></span></div>
+        <div class="cs-stat">Maintainability <span class="cs-bar"><i style="width:80%;background:#b07d1a;animation-delay:.3s"></i></span></div>
+        <div class="cs-stat">Performance <span class="cs-bar"><i style="width:60%;background:#b07d1a;animation-delay:.4s"></i></span></div>
+        <div class="cs-stat">Scalability <span class="cs-bar"><i style="width:20%;background:#c94b34;animation-delay:.5s"></i></span></div>
+      </div>
+      <div class="cs-col">
+        <div class="cs-label">Logical Components</div>
+        <div class="cs-val">Components<br>Hooks<br>Routes<br>Utils</div>
+        <div class="cs-label">Architectural Decisions</div>
+        <div class="cs-val">???</div>
+      </div>
+      <div class="cs-art">
+        <!-- hand-drawn-style ink tower (the monolith) -->
+        <svg viewBox="0 0 300 320" class="ink">
+          <g fill="none" stroke="#5a5346" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M110 300 L100 150 Q100 120 118 110 L118 70 L108 70 L108 52 L128 52 L128 40 L118 40 L118 26 L150 12 L182 26 L182 40 L172 40 L172 52 L192 52 L192 70 L182 70 L182 110 Q200 120 200 150 L190 300 Z"/>
+            <path d="M118 110 L182 110"/>
+            <path d="M150 12 L150 40"/>
+            <rect x="126" y="90" width="16" height="26" rx="8"/><rect x="158" y="90" width="16" height="26" rx="8"/>
+            <rect x="126" y="150" width="16" height="30" rx="8"/><rect x="158" y="150" width="16" height="30" rx="8"/>
+            <path d="M132 300 L132 250 Q150 232 168 250 L168 300"/>
+            <path d="M150 250 L150 300"/>
+            <path d="M70 300 Q150 286 230 300"/>
+            <path d="M60 300 Q90 292 78 276" stroke-width="1.6"/>
+            <path d="M240 300 Q214 290 226 276" stroke-width="1.6"/>
+          </g>
+        </svg>
+      </div>
     </div>
-    <div class="row">
-      <div class="chip g frag">✓ simple · fast to ship</div>
-      <div class="chip r frag">✗ weak stat: scalability</div>
-    </div>
-    <p class="key frag">The right default for most teams. The problem is never "monolith" — it's an <b>unstructured</b> one.</p>
-    <aside class="notes"><div class="t">Don't dunk on it</div><p>Character sheet for the monolithic SPA: promotes simplicity, ease of deployability, easy to maintain. Performance: not the best (client-side SPA), not the worst. The big drawback is scalability. Growing pains: lack of organization, hard to find/maintain, no clear boundaries.</p></aside>
+    <aside class="notes"><div class="t">The monolith character sheet</div><p>Monolithic SPA. Characteristics: simplicity 5/5, deployability 5/5, maintainability 4/5, performance 3/5, scalability 1/5. Logical components are just Components/Hooks/Routes/Utils — a technology split that doesn't tell you what the app is about. Decisions: none yet — that's what we'll add. Simplicity is a feature; the only weak stat is scalability.</p></aside>
   </section>
 
-  <!-- 8 · BIG BALL OF MUD -->
+  <!-- 8 · GROWING PAINS (course-vibe list) -->
+  <section class="slide">
+    <div class="kicker">03 · Stage 1 · Monoliths</div>
+    <h2>Growing Pains</h2>
+    <ul class="plist" style="max-width:none">
+      <li class="frag">Lack of organization<small>harder to find things &amp; onboard people / agents</small></li>
+      <li class="frag">Unclear boundaries<small>no ownership — teams start to step on each other</small></li>
+      <li class="frag">Change amplification<small>a small change touches files across the codebase</small></li>
+      <li class="frag">Overloaded shared abstractions<small>the "common" folder becomes a dumping ground</small></li>
+      <li class="frag">All-or-nothing dependencies · busy CI<small>upgrades are painful; release trains; builds &amp; tests take forever</small></li>
+    </ul>
+    <aside class="notes"><div class="t">Growing pains</div><p>These are the specific pains that push a monolith toward structure — and eventually toward a monorepo or micro-frontends.</p></aside>
+  </section>
+
+  <!-- 9 · BIG BALL OF MUD -->
   <section class="slide">
     <div class="kicker">03 · Stage 1 · Failure mode</div>
     <h2 class="r">The "big ball of mud"</h2>
     <div class="fig" style="max-width:640px">
-      <svg viewBox="0 0 640 200">
-        <text x="150" y="18" text-anchor="middle" class="lbl b" fill="#d1453b">no boundaries</text>
-        <g stroke="#d1453b" stroke-width="1.4" opacity=".65">
-          <line x1="80" y1="70" x2="220" y2="60"/><line x1="80" y1="70" x2="210" y2="150"/><line x1="80" y1="70" x2="150" y2="105"/>
-          <line x1="220" y1="60" x2="90" y2="150"/><line x1="220" y1="60" x2="150" y2="105"/><line x1="90" y1="150" x2="210" y2="150"/>
-          <line x1="90" y1="150" x2="150" y2="105"/><line x1="210" y1="150" x2="150" y2="105"/><line x1="80" y1="70" x2="90" y2="150"/>
+      <svg viewBox="0 0 640 210">
+        <text x="150" y="20" text-anchor="middle" class="lbl b" fill="#c94b34">no boundaries</text>
+        <g stroke="#c94b34" stroke-width="1.6" opacity=".7" fill="none">
+          <path class="draw" pathLength="1" d="M80 70 L220 60"/><path class="draw" pathLength="1" d="M80 70 L210 150"/><path class="draw" pathLength="1" d="M80 70 L150 105"/>
+          <path class="draw" pathLength="1" d="M220 60 L90 150"/><path class="draw" pathLength="1" d="M220 60 L150 105"/><path class="draw" pathLength="1" d="M90 150 L210 150"/>
+          <path class="draw" pathLength="1" d="M90 150 L150 105"/><path class="draw" pathLength="1" d="M210 150 L150 105"/><path class="draw" pathLength="1" d="M80 70 L90 150"/>
         </g>
-        <g fill="#fffdf8" stroke="#d1453b"><circle cx="80" cy="70" r="14"/><circle cx="220" cy="60" r="14"/><circle cx="90" cy="150" r="14"/><circle cx="210" cy="150" r="14"/><circle cx="150" cy="105" r="14"/></g>
-        <path d="M300 105 L360 105" stroke="#b6ab98" stroke-width="2" marker-end="url(#a2)"/>
-        <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#b6ab98"/></marker></defs>
-        <text x="500" y="18" text-anchor="middle" class="lbl b" fill="#2e9e69">clear boundaries</text>
-        <g stroke="#2e9e69" stroke-width="1.6"><line x1="440" y1="74" x2="460" y2="120"/><line x1="500" y1="74" x2="500" y2="120"/><line x1="560" y1="74" x2="540" y2="120"/></g>
-        <g fill="#fffdf8" stroke="#2e9e69"><circle cx="440" cy="60" r="14"/><circle cx="500" cy="60" r="14"/><circle cx="560" cy="60" r="14"/></g>
-        <rect x="420" y="120" width="160" height="30" rx="8" fill="#f3eefb" stroke="#7c4dd6"/><text x="500" y="140" text-anchor="middle" class="lbl" fill="#7c4dd6">shared platform</text>
+        <g fill="#f4f1e8" stroke="#c94b34" stroke-width="1.6"><circle cx="80" cy="70" r="14"/><circle cx="220" cy="60" r="14"/><circle cx="90" cy="150" r="14"/><circle cx="210" cy="150" r="14"/><circle cx="150" cy="105" r="14"/></g>
+        <path d="M300 108 L360 108" stroke="#b6ac96" stroke-width="2.4" fill="none" marker-end="url(#a2)"/>
+        <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#b6ac96"/></marker></defs>
+        <text x="500" y="20" text-anchor="middle" class="lbl b" fill="#6f7d3f">clear boundaries</text>
+        <g stroke="#6f7d3f" stroke-width="1.8" fill="none"><path class="draw" pathLength="1" d="M440 74 L460 120" style="animation-delay:.5s"/><path class="draw" pathLength="1" d="M500 74 L500 120" style="animation-delay:.6s"/><path class="draw" pathLength="1" d="M560 74 L540 120" style="animation-delay:.7s"/></g>
+        <g fill="#f4f1e8" stroke="#6f7d3f" stroke-width="1.6"><circle cx="440" cy="60" r="14"/><circle cx="500" cy="60" r="14"/><circle cx="560" cy="60" r="14"/></g>
+        <rect x="420" y="120" width="160" height="30" rx="8" fill="#f2e6ea" stroke="#8a5a6a"/><text x="500" y="140" text-anchor="middle" class="lbl" fill="#8a5a6a">shared platform</text>
       </svg>
     </div>
     <p class="say">A shared table used by <b>orders</b> and <b>customers</b> — a tweak for one breaks the other. Tests miss it.</p>
-    <aside class="notes"><div class="t">Name the enemy</div><p>Concrete demo: you add a "back to orders" link with a query param (TanStack Router). Ship it. 20 minutes later the customers app breaks — a shared order-line-items table with a tooltip-on-timeout is used by both, and the timeout means tests don't catch it. That implicit cross-module dependency, repeated everywhere, is the big ball of mud.</p></aside>
+    <aside class="notes"><div class="t">Name the enemy</div><p>A shared order-line-items table with a tooltip-on-timeout is used by both orders and customers; the timeout means tests don't catch it. Implicit cross-module dependency, everywhere.</p></aside>
   </section>
 
-  <!-- 9 · THE TRAP · interactive 2x2 -->
+  <!-- 10 · THE TRAP · fixed 2x2 -->
   <section class="slide">
     <div class="kicker">03 · Stage 1 · The trap 🔑</div>
     <h2>Modularity <span class="accent">before</span> distribution</h2>
-    <div class="fig quad" style="max-width:520px">
-      <svg viewBox="0 0 520 300">
-        <text x="260" y="292" text-anchor="middle" class="lbl">deployment units →</text>
-        <text x="14" y="150" text-anchor="middle" class="lbl" transform="rotate(-90 14 150)">modularity →</text>
+    <div class="fig quad" style="max-width:560px">
+      <svg viewBox="0 0 560 330">
+        <text x="300" y="322" text-anchor="middle" class="lbl">deployment units →</text>
+        <text x="16" y="185" text-anchor="middle" class="lbl" transform="rotate(-90 16 185)">modularity →</text>
         <g>
-          <g><rect x="60" y="150" width="200" height="120" rx="8" fill="#fdeeec" stroke="#d1453b"/><text x="160" y="205" text-anchor="middle" fill="#d1453b" font-weight="700" font-size="15">Big ball of mud</text><text x="160" y="226" text-anchor="middle" class="lbl">1 unit · low modularity</text></g>
-          <g><rect x="260" y="150" width="200" height="120" rx="8" fill="#fbe8e6" stroke="#d1453b"/><text x="360" y="198" text-anchor="middle" fill="#d1453b" font-weight="700" font-size="15">Distributed monolith</text><text x="360" y="219" text-anchor="middle" class="lbl">many units · low mod</text><text x="360" y="240" text-anchor="middle" fill="#d1453b" font-size="12">worst of both</text></g>
-          <g><rect x="60" y="30" width="200" height="120" rx="8" fill="#eaf6ef" stroke="#2e9e69"/><text x="160" y="85" text-anchor="middle" fill="#2e9e69" font-weight="700" font-size="15">Modular monolith</text><text x="160" y="106" text-anchor="middle" class="lbl">1 unit · high modularity</text></g>
-          <g><rect x="260" y="30" width="200" height="120" rx="8" fill="#e9f1fc" stroke="#2f6fd6"/><text x="360" y="85" text-anchor="middle" fill="#2f6fd6" font-weight="700" font-size="15">Micro-frontends</text><text x="360" y="106" text-anchor="middle" class="lbl">many units · high mod</text></g>
+          <g><rect x="90" y="185" width="205" height="115" rx="10" fill="#f5e3d9" stroke="#c94b34"/><text x="192" y="238" text-anchor="middle" fill="#c94b34" font-weight="700" font-size="15">Big ball of mud</text><text x="192" y="260" text-anchor="middle" class="lbl">1 unit · low modularity</text></g>
+          <g><rect x="315" y="185" width="205" height="115" rx="10" fill="#f2ddd5" stroke="#c94b34"/><text x="417" y="230" text-anchor="middle" fill="#c94b34" font-weight="700" font-size="15">Distributed monolith</text><text x="417" y="251" text-anchor="middle" class="lbl">many units · low mod</text><text x="417" y="271" text-anchor="middle" fill="#c94b34" font-size="12">worst of both</text></g>
+          <g><rect x="90" y="60" width="205" height="115" rx="10" fill="#eef0dd" stroke="#6f7d3f"/><text x="192" y="113" text-anchor="middle" fill="#6f7d3f" font-weight="700" font-size="15">Modular monolith</text><text x="192" y="135" text-anchor="middle" class="lbl">1 unit · high modularity</text></g>
+          <g><rect x="315" y="60" width="205" height="115" rx="10" fill="#fbe7e2" stroke="#df5b45"/><text x="417" y="113" text-anchor="middle" fill="#df5b45" font-weight="700" font-size="15">Micro-frontends</text><text x="417" y="135" text-anchor="middle" class="lbl">many units · high mod</text></g>
         </g>
-        <path d="M160 150 L160 90" stroke="#2e9e69" stroke-width="3" marker-end="url(#a3)"/>
-        <path d="M180 60 L340 60" stroke="#2f6fd6" stroke-width="3" marker-end="url(#a3b)"/>
+        <path class="draw" pathLength="1" d="M62 298 L62 78" fill="none" stroke="#6f7d3f" stroke-width="3.4" marker-end="url(#up)"/>
+        <text x="52" y="188" text-anchor="middle" fill="#6f7d3f" font-size="11.5" font-weight="700" transform="rotate(-90 52 188)">1 · raise modularity</text>
+        <path class="draw" pathLength="1" d="M110 40 L500 40" fill="none" stroke="#df5b45" stroke-width="3.4" marker-end="url(#rt)" style="animation-delay:.5s"/>
+        <text x="305" y="32" text-anchor="middle" fill="#df5b45" font-size="11.5" font-weight="700">2 · then distribute</text>
         <defs>
-          <marker id="a3" markerWidth="10" markerHeight="10" refX="5" refY="8" orient="auto"><path d="M0 0 L10 0 L5 9 z" fill="#2e9e69"/></marker>
-          <marker id="a3b" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#2f6fd6"/></marker>
+          <marker id="up" markerWidth="12" markerHeight="12" refX="4.5" refY="3" orient="auto"><path d="M4.5 0 L9 8 L0 8 z" fill="#6f7d3f"/></marker>
+          <marker id="rt" markerWidth="10" markerHeight="10" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#df5b45"/></marker>
         </defs>
       </svg>
     </div>
     <p class="key w">Add deploy units to a mess → a <b class="r">distributed monolith</b>. Raise modularity <b>first</b>, then distribute.</p>
-    <aside class="notes"><div class="t">The senior insight</div><p>When the monolith hurts, everyone shouts "micro-frontends!" That's a trap. Two independent dimensions: number of deployment units, and degree of modularity. Big ball of mud = 1 unit, low modularity. Micro-frontends = many units, high modularity. If you add deployment units WITHOUT first raising modularity, you get a distributed big ball of mud — all the old pain plus network, versioning and communication pain. Invest in modularity first (green arrow up), then distribute (blue arrow right).</p></aside>
+    <aside class="notes"><div class="t">The senior insight</div><p>Two dimensions: deployment units × modularity. Add units without raising modularity first → a distributed big ball of mud. Green arrow up (modularity first), then coral arrow right (distribute). Hover a quadrant to focus it.</p></aside>
   </section>
 
-  <!-- 10 · MODULAR MONOLITH + DDD -->
+  <!-- 11 · MODULAR MONOLITH + DDD -->
   <section class="slide">
     <div class="kicker">03 · Stage 1 · The fix</div>
     <h2 class="arch">Modules = business subdomains</h2>
@@ -259,75 +343,74 @@
       <div class="chip w frag">Generic<small>auth · roles · permissions</small></div>
     </div>
     <p class="key frag">Structure: modules → screens → features → components. Stay <b>consistent</b>.</p>
-    <aside class="notes"><div class="t">DDD subdomains</div><p>To build a modular monolith, use Domain-Driven Design subdomains to identify modules. Three types: core (make you unique — order management, product catalog), supporting (important but not differentiating — inventory, customers, analytics), generic (every app has them — auth, user management, roles, permissions). Find them by reading the UI: nav and routes. Core subdomains deserve more tests, stronger boundaries, and are the ones most likely to get their own team later. Folder structure: one module per subdomain → screens → features → components (+ api, hooks). Consistency matters more than the exact shape. (Branch: modular-monolith.)</p></aside>
+    <aside class="notes"><div class="t">DDD subdomains</div><p>Core (differentiators), supporting, generic. Find them by reading the nav and routes. Core subdomains get more tests, stronger boundaries, later their own team. Consistency beats the perfect structure.</p></aside>
   </section>
 
-  <!-- 11 · PATTERNS MENU (NEW) -->
+  <!-- 12 · PATTERNS MENU -->
   <section class="slide">
     <div class="kicker">03 · Stage 1 · Patterns</div>
     <h2>A menu of patterns</h2>
-    <div class="row">
-      <div class="pill-wrap">
-        <span class="pill">Layered</span><span class="pill">Clean</span><span class="pill">Hexagonal (ports &amp; adapters)</span>
-        <span class="pill">Domain-Driven Design</span><span class="pill">Atomic design</span><span class="pill">Feature-Slice design</span>
-      </div>
+    <div style="max-width:820px; margin-top:12px">
+      <span class="pill">Layered</span><span class="pill">Clean</span><span class="pill">Hexagonal · ports &amp; adapters</span>
+      <span class="pill">Domain-Driven Design</span><span class="pill">Atomic design</span><span class="pill">Feature-Slice design</span>
     </div>
-    <style>.pill-wrap{max-width:760px} .pill{display:inline-block; background:var(--bg2); border:1px solid var(--line); border-radius:99px; padding:8px 18px; font-size:min(2vw,21px); margin:5px; box-shadow:var(--shadow)}</style>
-    <p class="key">Most were designed for the back end. Don't force one to the letter — DDD subdomains + <b>feature-slice</b> fit the front end best.</p>
-    <aside class="notes"><div class="t">Patterns</div><p>Layered (split into layers), Clean (entities/use-cases), Hexagonal (ports & adapters — precursor to Clean), DDD, Atomic design (fell out of fashion but fits components), and Feature-Slice design (enough structure to place logic, not too strict — great for front end). Trying to fit Clean architecture into a pure frontend feels clunky; don't follow one to a T. Maxi's approach: DDD subdomains → folder structure → boundaries = a modular monolith. Formal subdomain discovery: the "DDD Starter Modeling Process" repo.</p></aside>
+    <style>.pill{display:inline-block; background:var(--panel); border:1px solid var(--line); border-radius:99px; padding:9px 20px; font-size:min(2vw,21px); margin:6px; box-shadow:var(--shadow)}</style>
+    <p class="key">Most were built for the back end. Don't force one to the letter — DDD subdomains + <b>feature-slice</b> fit the front end best.</p>
+    <aside class="notes"><div class="t">Patterns</div><p>Layered, Clean, Hexagonal (ports & adapters), DDD, Atomic, Feature-Slice (great for front end). Don't follow a backend pattern to a T. Formal discovery: the "DDD Starter Modeling Process" repo.</p></aside>
   </section>
 
-  <!-- 12 · ORGANIZATION + ENCAPSULATION (NEW) -->
+  <!-- 13 · ORGANIZATION + ENCAPSULATION -->
   <section class="slide">
     <div class="kicker">03 · Stage 1 · Two halves</div>
-    <h2>Modularity = organization + <span class="accent">encapsulation</span></h2>
-    <pre><span class="cmt">// organization: folders by subdomain</span>
-src/modules/{ catalog, orders, customers, authentication }
-src/shared/            <span class="cmt">ui · api client · utils</span>
+    <h2>Organization + <span class="accent">encapsulation</span></h2>
+    <p class="say" style="max-width:52ch">Organizing folders is only half. <b>Encapsulation</b> — a boundary nothing may cross — is the other half.</p>
+    <pre>  <span class="cmt">// organization — folders by subdomain</span>
+  src/modules/{ catalog, orders, customers, authentication }
+  src/shared/            <span class="cmt">ui · api client · utils</span>
 
-<span class="cmt">// encapsulation: deps point DOWN; features never import siblings</span>
-<span class="cmt">// like private class members / ES-module exports — but for architecture</span></pre>
-    <aside class="notes"><div class="t">The missing half</div><p>Re-organizing folders is only half of modularity. The other half is encapsulation — familiar from OOP (private members), closures, and ES modules (only exports are public). Architecture has no built-in encapsulation, so we create the boundaries ourselves. Boundary types: module boundary (a module can't reach another module's internals), layer boundary (deps flow one way, down), and information hiding via an interface (expose an interface; others depend only on it). Other languages have ArchUnit; JS has ESLint rules.</p></aside>
+  <span class="cmt">// encapsulation — deps point DOWN; features never import siblings</span>
+</pre>
+    <aside class="notes"><div class="t">The missing half</div><p>Encapsulation is familiar from OOP private members, closures, ES-module exports. Architecture has none built in — we create the boundaries. Types: module, layer, information-hiding via interface. Other langs: ArchUnit; JS: ESLint rules.</p></aside>
   </section>
 
-  <!-- 13 · ENFORCE -->
+  <!-- 14 · ENFORCE -->
   <section class="slide">
     <div class="kicker">03 · Stage 1 · Make it stick</div>
     <h2>A bad import <span class="r">fails CI</span></h2>
     <div class="fig" style="max-width:560px">
       <svg viewBox="0 0 560 130">
-        <rect x="40" y="45" width="160" height="46" rx="10" fill="#fffdf8" stroke="#2f6fd6"/><text x="120" y="73" text-anchor="middle" fill="#2c2822" font-size="14" font-weight="700">catalog</text>
-        <rect x="360" y="45" width="160" height="46" rx="10" fill="#fffdf8" stroke="#2f6fd6"/><text x="440" y="73" text-anchor="middle" fill="#2c2822" font-size="14" font-weight="700">orders</text>
-        <line x1="200" y1="68" x2="360" y2="68" stroke="#d1453b" stroke-width="3" stroke-dasharray="7 6"/>
-        <circle cx="280" cy="68" r="18" fill="#fdeeec" stroke="#d1453b" stroke-width="2"/><text x="280" y="75" text-anchor="middle" fill="#d1453b" font-size="20" font-weight="800">✗</text>
+        <rect x="40" y="45" width="160" height="46" rx="10" fill="#f4f1e8" stroke="#df5b45"/><text x="120" y="73" text-anchor="middle" fill="#20242e" font-size="14" font-weight="700">catalog</text>
+        <rect x="360" y="45" width="160" height="46" rx="10" fill="#f4f1e8" stroke="#df5b45"/><text x="440" y="73" text-anchor="middle" fill="#20242e" font-size="14" font-weight="700">orders</text>
+        <path class="draw" pathLength="1" d="M200 68 L360 68" stroke="#c94b34" stroke-width="3" stroke-dasharray="7 6" fill="none"/>
+        <circle class="pop" cx="280" cy="68" r="18" fill="#f5e3d9" stroke="#c94b34" stroke-width="2"/><text class="pop" x="280" y="75" text-anchor="middle" fill="#c94b34" font-size="20" font-weight="800">✗</text>
         <text x="280" y="112" text-anchor="middle" class="lbl">sibling import — blocked</text>
       </svg>
     </div>
     <p class="say">Enforced 3 ways: <b>eslint-plugin-boundaries</b> · <b>Dependency Cruiser</b> · <b>Turborepo tags</b>.</p>
-    <aside class="notes"><div class="t">Boundaries as code</div><p>ESLint (works with Biome/OXLint too): no-restricted-imports built in; the boundaries plugin defines "elements" + dependency rules. Keep default:disallow so every new element forces a decision. Elements: shared + authentication = platform; modules/* capture the moduleName. Rule: a module may import platform + itself (captured name), never a sibling; allow type-only imports (checked at build). Errors dropped 106 → 31 → 18 → 2 as rules tightened; the final 2 were the real bug. Dependency Cruiser (npm run lint:deps) enforces the same, draws the graph, and can flag a "shared" file used by fewer than 2 modules (cohesion: things that change together belong together). These rules are also the guardrails AI agents hit on the next lint run.</p></aside>
+    <aside class="notes"><div class="t">Boundaries as code</div><p>default:disallow. A module may import platform + itself, never a sibling; allow type-only imports. Errors 106 → 31 → 18 → 2. Dependency Cruiser draws the graph + cohesion checks. These rules are the guardrails AI agents hit on the next lint.</p></aside>
   </section>
 
-  <!-- 14 · MONOREPO -->
+  <!-- 15 · MONOREPO (interactive tree) -->
   <section class="slide">
     <div class="kicker">04 · Stage 2</div>
     <h2>Split into <span class="accent">packages</span></h2>
     <div class="fig" style="max-width:640px">
-      <svg viewBox="0 0 640 170">
+      <svg viewBox="0 0 640 175">
+        <g stroke="#c7bda6" stroke-width="1.8" fill="none"><path class="draw" pathLength="1" d="M320 52 L130 78"/><path class="draw" pathLength="1" d="M320 52 L320 78"/><path class="draw" pathLength="1" d="M320 52 L510 78"/></g>
         <g text-anchor="middle" font-size="14" font-weight="700">
-          <rect x="230" y="12" width="180" height="40" rx="10" fill="#e9f1fc" stroke="#2f6fd6"/><text x="320" y="37" fill="#2c2822">app-shell (host)</text>
-          <rect x="60" y="78" width="140" height="36" rx="8" fill="#eaf6ef" stroke="#2e9e69"/><text x="130" y="101" fill="#2c2822" font-size="13">catalog</text>
-          <rect x="250" y="78" width="140" height="36" rx="8" fill="#eaf6ef" stroke="#2e9e69"/><text x="320" y="101" fill="#2c2822" font-size="13">orders</text>
-          <rect x="440" y="78" width="140" height="36" rx="8" fill="#e9f1fc" stroke="#2f6fd6"/><text x="510" y="101" fill="#2c2822" font-size="13">analytics</text>
-          <rect x="150" y="128" width="340" height="34" rx="8" fill="#f3eefb" stroke="#7c4dd6"/><text x="320" y="150" fill="#7c4dd6" font-size="13">platform · ui · shared · authentication</text>
-          <g stroke="#cabfa9" stroke-width="1.6"><line x1="320" y1="52" x2="130" y2="78"/><line x1="320" y1="52" x2="320" y2="78"/><line x1="320" y1="52" x2="510" y2="78"/></g>
+          <rect class="hn" x="230" y="12" width="180" height="40" rx="10" fill="#fbe7e2" stroke="#df5b45"/><text x="320" y="37" fill="#20242e">app-shell (host)</text>
+          <rect class="hn" x="60" y="78" width="140" height="36" rx="8" fill="#eef0dd" stroke="#6f7d3f"/><text x="130" y="101" fill="#20242e" font-size="13">catalog</text>
+          <rect class="hn" x="250" y="78" width="140" height="36" rx="8" fill="#eef0dd" stroke="#6f7d3f"/><text x="320" y="101" fill="#20242e" font-size="13">orders</text>
+          <rect class="hn" x="440" y="78" width="140" height="36" rx="8" fill="#fbe7e2" stroke="#df5b45"/><text x="510" y="101" fill="#20242e" font-size="13">analytics</text>
+          <rect class="hn" x="150" y="130" width="340" height="34" rx="8" fill="#f2e6ea" stroke="#8a5a6a"/><text x="320" y="152" fill="#8a5a6a" font-size="13">platform · ui · shared · authentication</text>
         </g>
       </svg>
     </div>
     <p class="say"><code>apps/</code> + <code>packages/</code> · 3 steps: workspace → packages → tooling · a package's <code>exports</code> = its interface.</p>
-    <aside class="notes"><div class="t">Folders become packages</div><p>Two ways in: decompose a monolith, or bring scattered repos together. Three-step adoption: (1) one workspace, (2) break into packages, (3) add tooling. Structure: an app shell (imports everything, the one deploy) + one app per module + packages ui, shared, tooling. Workspaces (npm/pnpm/Bun/Deno) let packages import each other without publishing to npm. A package's exports field is its interface — consumers get only the screens you expose. Still one build: only the app shell is deployed. (Branch: full-monorepo.)</p></aside>
+    <aside class="notes"><div class="t">Folders become packages</div><p>Three-step adoption. App shell (one deploy) + one app per module + packages ui, shared, tooling. Workspaces share without publishing to npm. exports = interface. Still one build.</p></aside>
   </section>
 
-  <!-- 15 · SHARING CODE (NEW) -->
+  <!-- 16 · SHARING CODE -->
   <section class="slide">
     <div class="kicker">04 · Stage 2 · Sharing code</div>
     <h2>Four ways to share</h2>
@@ -338,46 +421,46 @@ src/shared/            <span class="cmt">ui · api client · utils</span>
       <div class="chip frag g">Dependency injection<small>slot pattern — decouples</small></div>
     </div>
     <p class="key frag">If everything keeps moving to <b>shared</b>, rethink your abstractions.</p>
-    <aside class="notes"><div class="t">Trade-offs</div><p>Options to share code across packages: move it to a shared package (easy, but becomes the junk drawer), expose a limited interface (what authentication does with its exports), duplicate (fine for small pieces), or dependency injection / the slot pattern (the app shell has a slot the builder fills — decouples the shell from the search feature). If you find yourself moving everything to shared, your abstractions are probably wrong.</p></aside>
+    <aside class="notes"><div class="t">Trade-offs</div><p>Shared package (junk drawer), interface (exports), duplicate, or dependency injection / slot pattern. If everything migrates to shared, the abstractions are wrong.</p></aside>
   </section>
 
-  <!-- 16 · TURBOREPO -->
+  <!-- 17 · TURBOREPO -->
   <section class="slide">
     <div class="kicker">04 · Stage 2 · Tooling</div>
     <h2>Turborepo</h2>
     <div class="fig" style="max-width:520px">
       <svg viewBox="0 0 520 150">
         <text x="20" y="45" class="lbl b" font-size="15">cold build</text>
-        <rect x="150" y="28" width="330" height="26" rx="6" fill="#b9770c"/><text x="470" y="47" text-anchor="end" fill="#fff" font-weight="800" font-size="14">9 s</text>
+        <rect x="150" y="28" width="330" height="26" rx="6" fill="#ddd6c4"/><rect class="growbar" x="150" y="28" width="330" height="26" rx="6" fill="#b07d1a"/><text x="470" y="47" text-anchor="end" fill="#fff" font-weight="800" font-size="14">9 s</text>
         <text x="20" y="105" class="lbl b" font-size="15">cached</text>
-        <rect x="150" y="88" width="12" height="26" rx="6" fill="#2e9e69"/><text x="176" y="107" fill="#2e9e69" font-weight="800" font-size="14">18 ms</text>
+        <rect x="150" y="88" width="330" height="26" rx="6" fill="#ddd6c4"/><rect class="growbar" x="150" y="88" width="14" height="26" rx="6" fill="#6f7d3f" style="animation-delay:.5s"/><text x="176" y="107" fill="#6f7d3f" font-weight="800" font-size="14">18 ms</text>
         <text x="20" y="140" class="lbl">rebuild only what changed · tags deny platform → module</text>
       </svg>
     </div>
     <p class="say">Caching + task orchestration + boundary <b>tags</b> · graph + devtools · catches cycles.</p>
-    <aside class="notes"><div class="t">Speed + rules</div><p>Options: Turborepo, Nx (popular in JS), Bazel/Gradle (bigger scale/other langs), Lerna (legacy). They solve caching (local + remote) and task orchestration (build order). turbo.json: build dependsOn ^build (deps first), outputs ["dist/**"] so cache restores the folder; dev is persistent + no-cache. `turbo boundaries` checks cyclical deps, package-internal leaks, and undeclared deps (npm hoisting). Tags: per-package turbo.json tags ["platform"|"module"]; root denies platform → module. Tools: `turbo run build --graph` (mermaid), `turbo devtools`, generate, query.</p></aside>
+    <aside class="notes"><div class="t">Speed + rules</div><p>Caching (local+remote) + orchestration. turbo.json: dependsOn ^build, outputs dist; dev persistent. `turbo boundaries` checks cycles, leaks, undeclared deps; tags deny platform → module.</p></aside>
   </section>
 
-  <!-- 17 · WHEN MFE -->
+  <!-- 18 · WHEN MFE -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>When micro-frontends?</h2>
-    <div class="fig" style="max-width:560px">
-      <svg viewBox="0 0 560 250">
-        <line x1="60" y1="210" x2="540" y2="210" stroke="#e6ddcc"/><line x1="60" y1="20" x2="60" y2="210" stroke="#e6ddcc"/>
-        <path d="M60 200 C 250 190, 360 110, 520 30" fill="none" stroke="#b9770c" stroke-width="3"/>
-        <path d="M60 120 C 220 105, 380 95, 520 90" fill="none" stroke="#2f6fd6" stroke-width="3"/>
-        <text x="524" y="30" class="lbl b" fill="#b9770c" text-anchor="end">coordination cost (monolith)</text>
-        <text x="524" y="108" class="lbl b" fill="#2f6fd6" text-anchor="end">distributed-system cost</text>
-        <circle cx="360" cy="103" r="7" fill="#2e9e69"/><text x="360" y="140" text-anchor="middle" fill="#2e9e69" font-weight="700" font-size="14">adopt here</text>
-        <text x="300" y="238" text-anchor="middle" class="lbl">complexity / team growth →</text>
+    <div class="fig" style="max-width:600px">
+      <svg viewBox="0 0 600 260">
+        <line x1="70" y1="215" x2="560" y2="215" stroke="#d8d2c2"/><line x1="70" y1="25" x2="70" y2="215" stroke="#d8d2c2"/>
+        <path class="draw" pathLength="1" d="M70 205 C 270 195, 380 120, 545 45" fill="none" stroke="#b07d1a" stroke-width="3.4"/>
+        <path class="draw" pathLength="1" d="M70 120 C 240 108, 400 96, 545 88" fill="none" stroke="#df5b45" stroke-width="3.4" style="animation-delay:.3s"/>
+        <text x="545" y="40" class="lbl b" fill="#b07d1a" text-anchor="end">coordination cost (monolith)</text>
+        <text x="545" y="106" class="lbl b" fill="#df5b45" text-anchor="end">distributed-system cost</text>
+        <circle class="pop" cx="392" cy="102" r="8" fill="#6f7d3f"/><text x="392" y="132" text-anchor="middle" fill="#6f7d3f" font-weight="700" font-size="14">adopt here</text>
+        <text x="315" y="248" text-anchor="middle" class="lbl">complexity / team growth →</text>
       </svg>
     </div>
     <p class="say">An <b>organizational</b> problem — teams that must deploy independently.</p>
-    <aside class="notes"><div class="t">Earn stage 3</div><p>Growing pains: teams need independent deploys (single pipeline = bottleneck), legacy areas you want to update one at a time, and diverging architectural drivers (different teams care about different things). Rule of thumb: adopt when the cost of coordinating the monolith exceeds the cost of running the distributed architecture. Both rise; adopt at the crossover.</p></aside>
+    <aside class="notes"><div class="t">Earn stage 3</div><p>Independent deploys, legacy updated piecemeal, diverging drivers. Adopt when coordination cost of the monolith exceeds the distributed-system cost. The dot is the crossover.</p></aside>
   </section>
 
-  <!-- 18 · MFE FLAVORS (NEW) -->
+  <!-- 19 · MFE FLAVORS -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Options</div>
     <h2>Flavors — start simple</h2>
@@ -387,31 +470,30 @@ src/shared/            <span class="cmt">ui · api client · utils</span>
       <div class="chip frag g">Module Federation<small>runtime code-sharing · default</small></div>
     </div>
     <p class="key frag">Split <b>vertical</b> (by route) or <b>horizontal</b> (part of a view). Cheat: vertical-only → <b>DIY proxy</b> · isolation → iframes · Next.js → multi-zones · else → Module Federation.</p>
-    <aside class="notes"><div class="t">The menu</div><p>Questions to pick a flavor: how to split (vertical = by route; horizontal = part of one view), where routing/rendering happen (server/client/edge), where to compose, and how much isolation. Flavors: iframes (isolation, postMessage), web components (runtime + isolation), native platform (edge-side includes, import maps), fragment-orchestration libs (single-spa — largely unmaintained; Piral, Qwik fragments), route-based (Cloudflare Workers, Next.js multi-zones), and Module Federation / Native Federation. Maxi builds it raw first (branch DIY): apps on separate ports, a proxy per route, an iframe for a horizontal piece, localStorage for same-origin state (use a secure cookie for auth). Cheat sheet: vertical only → DIY proxy (NGINX/Node/even Laravel); full isolation → iframes; Next.js → multi-zones; experiment → Qwik; otherwise Module Federation (safe, widely-supported, SSR).</p></aside>
+    <aside class="notes"><div class="t">The menu</div><p>Decide the split (vertical/horizontal), routing/rendering/composition, isolation. Flavors: iframes, web components, native (import maps/ESI), fragment libs (single-spa — unmaintained; Qwik), route-based (Cloudflare, Next multi-zones), Module Federation. Build raw first (DIY: ports + proxy + iframe, same-origin state).</p></aside>
   </section>
 
-  <!-- 19 · MODULE FEDERATION -->
+  <!-- 20 · MODULE FEDERATION (flow + teams) -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Module Federation</h2>
-    <div class="fig" style="max-width:640px">
-      <svg viewBox="0 0 640 160">
-        <rect x="200" y="14" width="240" height="40" rx="10" fill="#e9f1fc" stroke="#2f6fd6"/><text x="320" y="39" text-anchor="middle" fill="#2c2822" font-weight="700" font-size="14">app-shell · host</text>
+    <div class="fig" style="max-width:660px">
+      <svg viewBox="0 0 660 170">
+        <g stroke="#6f7d3f" stroke-width="2" fill="none" class="flow"><path d="M310 56 L145 100"/><path d="M330 56 L330 100"/><path d="M350 56 L515 100"/></g>
+        <rect class="hn" x="210" y="14" width="240" height="42" rx="10" fill="#fbe7e2" stroke="#df5b45"/><text x="330" y="41" text-anchor="middle" fill="#20242e" font-weight="700" font-size="14">app-shell · host</text>
         <g text-anchor="middle" font-size="13">
-          <rect x="60" y="96" width="150" height="40" rx="8" fill="#eaf6ef" stroke="#2e9e69" stroke-dasharray="4 4"/><text x="135" y="121" fill="#2c2822">analytics</text>
-          <rect x="245" y="96" width="150" height="40" rx="8" fill="#eaf6ef" stroke="#2e9e69" stroke-dasharray="4 4"/><text x="320" y="121" fill="#2c2822">catalog</text>
-          <rect x="430" y="96" width="150" height="40" rx="8" fill="#eaf6ef" stroke="#2e9e69" stroke-dasharray="4 4"/><text x="505" y="121" fill="#2c2822">orders</text>
+          <g class="hn"><rect x="60" y="100" width="170" height="44" rx="8" fill="#eef0dd" stroke="#6f7d3f" stroke-dasharray="4 4"/><text x="145" y="120" fill="#20242e">analytics</text><text x="145" y="136" class="lbl" font-size="11">team A</text></g>
+          <g class="hn"><rect x="245" y="100" width="170" height="44" rx="8" fill="#eef0dd" stroke="#6f7d3f" stroke-dasharray="4 4"/><text x="330" y="120" fill="#20242e">catalog</text><text x="330" y="136" class="lbl" font-size="11">team B</text></g>
+          <g class="hn"><rect x="430" y="100" width="170" height="44" rx="8" fill="#eef0dd" stroke="#6f7d3f" stroke-dasharray="4 4"/><text x="515" y="120" fill="#20242e">orders</text><text x="515" y="136" class="lbl" font-size="11">team C</text></g>
         </g>
-        <g stroke="#2e9e69" stroke-width="1.6" stroke-dasharray="4 4"><line x1="300" y1="54" x2="135" y2="96"/><line x1="320" y1="54" x2="320" y2="96"/><line x1="340" y1="54" x2="505" y2="96"/></g>
-        <text x="320" y="152" text-anchor="middle" class="lbl">loaded at runtime · each deploys alone</text>
+        <text x="330" y="162" text-anchor="middle" class="lbl">loaded at runtime · each team deploys alone</text>
       </svg>
     </div>
-    <pre><span class="kw">const</span> A = <span class="fn">lazy</span>(() => <span class="fn">import</span>(<span class="st">"analytics/Dashboard"</span>));  <span class="cmt">// React = singleton</span>
-<span class="cmt">// &lt;Suspense&gt;&lt;ErrorBoundary&gt; ... &lt;/&gt;&lt;/&gt;  — a down remote can't crash the host</span></pre>
-    <aside class="notes"><div class="t">Core mechanism</div><p>Module Federation (from Webpack 5, now standalone — module-federation.io) is both a pattern and an implementation; plugins for Rsbuild, Rspack, webpack, Vite (Vite has no dev). It lets two independently-deployed apps share code at runtime. Host = app-shell; remote = analytics, exposing ./Dashboard via a generated remoteEntry.js. `shared` negotiates dependencies — React must be a singleton (same instance) or context breaks across the boundary. Import with React.lazy + Suspense + an error boundary; the classic bug is forgetting to await the import. `import:false` skips the fallback React when the host has it. Host and remotes can be different frameworks → great for incremental migration.</p></aside>
+    <pre><span class="kw">const</span> A = <span class="fn">lazy</span>(() => <span class="fn">import</span>(<span class="st">"analytics/Dashboard"</span>));  <span class="cmt">// React = singleton</span></pre>
+    <aside class="notes"><div class="t">Core mechanism</div><p>A host loads remotes at runtime via a generated remoteEntry.js. `shared` negotiates deps — React must be a singleton or context breaks. lazy + Suspense + error boundary; the classic bug is forgetting to await. Host and remotes can be different frameworks → incremental migration.</p></aside>
   </section>
 
-  <!-- 20 · DECOUPLE -->
+  <!-- 21 · DECOUPLE -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Keep them <span class="accent">independent</span></h2>
@@ -419,12 +501,12 @@ src/shared/            <span class="cmt">ui · api client · utils</span>
       <div class="chip frag">Component<small>= reuse</small></div>
       <div class="chip a frag">Micro-frontend<small>= independence</small></div>
     </div>
-    <p class="say frag">Few props · share state via <b>Nanostores</b> — expose a <b>listener</b>, not the atom.</p>
-    <p class="say frag"><b>MF 2.0</b>: auto types + <code>mf-manifest.json</code> = service discovery (name → URL → version).</p>
-    <aside class="notes"><div class="t">Independence is the point</div><p>Comms: iframes → postMessage; Module Federation → props/context (same React instance), events/message bus, or signals/atoms. Don't over-rely on props: a component is about reuse, a micro-frontend about independence — every prop couples them. Nanostores: the remote owns the state (atom) and exposes a listener, so consumers subscribe but can't mutate. Module Federation 2.0 auto-generates types (@mf-types → tsconfig) and adds mf-manifest.json — frontend service discovery. Version management schemas: AWS frontend-service-discovery, Vercel microfrontends.json. Turbo can do multi-version via separate builds (build V1/V2).</p></aside>
+    <p class="say frag" style="max-width:52ch">Few props · share state via <b>Nanostores</b> — expose a <b>listener</b>, not the atom.</p>
+    <p class="say frag" style="max-width:52ch"><b>MF 2.0</b>: auto types + <code>mf-manifest.json</code> = service discovery.</p>
+    <aside class="notes"><div class="t">Independence is the point</div><p>Comms: postMessage / props / events / signals. A component is about reuse, a micro-frontend about independence. Nanostores: the remote owns the atom, exposes a listener. MF 2.0 auto-types + mf-manifest.json = service discovery (AWS, Vercel schemas too).</p></aside>
   </section>
 
-  <!-- 21 · COST -->
+  <!-- 22 · COST -->
   <section class="slide">
     <div class="kicker">06 · The catch</div>
     <h2 class="r">Micro-frontends aren't free</h2>
@@ -434,84 +516,84 @@ src/shared/            <span class="cmt">ui · api client · utils</span>
       <div class="chip r frag">Many pipelines<small>harder to debug</small></div>
     </div>
     <p class="key w frag">Adopt from a <b>cost analysis</b>, never for novelty.</p>
-    <aside class="notes"><div class="t">Honesty = senior signal</div><p>Downsides: CSS conflicts (which remote loads first) — fix with Tailwind, whose atomic utilities decouple styles the way atomic stores decouple state; duplicated deps + runtime version skew; and many pipelines to babysit. Adopt from a cost analysis. Showing trade-offs — not selling the shiny thing — is senior thinking.</p></aside>
+    <aside class="notes"><div class="t">Honesty = senior signal</div><p>CSS conflicts → Tailwind atomic utilities; duplicated deps + version skew; many pipelines. Adopt from a cost analysis.</p></aside>
   </section>
 
-  <!-- 22 · DECISION FRAMEWORK -->
+  <!-- 23 · DECISION FRAMEWORK -->
   <section class="slide">
     <div class="kicker">06 · The payoff</div>
     <h2>Match the pattern to the <span class="accent">pain</span></h2>
-    <div class="fig" style="max-width:720px">
-      <svg viewBox="0 0 720 190">
+    <div class="fig" style="max-width:740px">
+      <svg viewBox="0 0 740 200">
         <g font-size="15">
-          <rect x="10" y="14" width="360" height="46" rx="8" fill="#fffdf8" stroke="#e6ddcc"/><text x="26" y="42" fill="#7c7266">Messy app, one team</text>
-          <rect x="410" y="14" width="300" height="46" rx="8" fill="#eaf6ef" stroke="#2e9e69"/><text x="426" y="42" fill="#2e9e69" font-weight="700">Modular monolith</text>
-          <rect x="10" y="72" width="360" height="46" rx="8" fill="#fffdf8" stroke="#e6ddcc"/><text x="26" y="100" fill="#7c7266">Many apps share code</text>
-          <rect x="410" y="72" width="300" height="46" rx="8" fill="#f3eefb" stroke="#7c4dd6"/><text x="426" y="100" fill="#7c4dd6" font-weight="700">Monorepo</text>
-          <rect x="10" y="130" width="360" height="46" rx="8" fill="#fffdf8" stroke="#e6ddcc"/><text x="26" y="158" fill="#7c7266">Teams blocked on deploys</text>
-          <rect x="410" y="130" width="300" height="46" rx="8" fill="#e9f1fc" stroke="#2f6fd6"/><text x="426" y="158" fill="#2f6fd6" font-weight="700">Micro-frontends</text>
-          <g stroke="#cabfa9" stroke-width="2" marker-end="url(#a4)"><line x1="372" y1="37" x2="406" y2="37"/><line x1="372" y1="95" x2="406" y2="95"/><line x1="372" y1="153" x2="406" y2="153"/></g>
+          <rect x="10" y="16" width="370" height="48" rx="9" fill="#f4f1e8" stroke="#d8d2c2"/><text x="28" y="45" fill="#6f6a5e">Messy app, one team</text>
+          <rect x="430" y="16" width="300" height="48" rx="9" fill="#eef0dd" stroke="#6f7d3f"/><text x="448" y="45" fill="#6f7d3f" font-weight="700">Modular monolith</text>
+          <rect x="10" y="76" width="370" height="48" rx="9" fill="#f4f1e8" stroke="#d8d2c2"/><text x="28" y="105" fill="#6f6a5e">Many apps share code</text>
+          <rect x="430" y="76" width="300" height="48" rx="9" fill="#f2e6ea" stroke="#8a5a6a"/><text x="448" y="105" fill="#8a5a6a" font-weight="700">Monorepo</text>
+          <rect x="10" y="136" width="370" height="48" rx="9" fill="#f4f1e8" stroke="#d8d2c2"/><text x="28" y="165" fill="#6f6a5e">Teams blocked on deploys</text>
+          <rect x="430" y="136" width="300" height="48" rx="9" fill="#fbe7e2" stroke="#df5b45"/><text x="448" y="165" fill="#df5b45" font-weight="700">Micro-frontends</text>
+          <g stroke="#c7bda6" stroke-width="2.4" fill="none" marker-end="url(#a4)"><path class="draw" pathLength="1" d="M382 40 L426 40"/><path class="draw" pathLength="1" d="M382 100 L426 100" style="animation-delay:.2s"/><path class="draw" pathLength="1" d="M382 160 L426 160" style="animation-delay:.4s"/></g>
         </g>
-        <defs><marker id="a4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#cabfa9"/></marker></defs>
+        <defs><marker id="a4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#c7bda6"/></marker></defs>
       </svg>
     </div>
     <p class="say">Pick by pain, not trend. Modularity <b>before</b> distribution.</p>
-    <aside class="notes"><div class="t">The takeaway</div><p>The whole course in one table. Don't pick by trend — pick by pain. Always raise modularity before distributing. The smallest architecture that removes the pain wins. This is the slide to photograph.</p></aside>
+    <aside class="notes"><div class="t">The takeaway</div><p>The whole course in one table. Always raise modularity before distributing. Smallest architecture that removes the pain wins.</p></aside>
   </section>
 
-  <!-- 23 · AI -->
+  <!-- 24 · AI -->
   <section class="slide">
     <div class="kicker">07 · Modern angle</div>
     <h2 class="ai">Architecture &amp; AI</h2>
     <div class="row" style="margin-top:22px">
-      <div class="chip frag ai" style="border-color:var(--ai); border-top:3px solid var(--ai)">AI builds the structure<small>scaffold · refactor · diagrams</small></div>
+      <div class="chip frag" style="border-top:3px solid var(--teal)">AI builds the structure<small>scaffold · refactor · diagrams</small></div>
       <div class="chip frag w">You decide the boundary<small>AI can't</small></div>
     </div>
-    <p class="say frag">Boundaries = <b>guardrails</b> for agents; docs = <b>context</b>. Judgment is worth <b>more</b>.</p>
-    <aside class="notes"><div class="t">Modern angle</div><p>Architecture fundamentals grow MORE important with AI, even as low-level tricks (refactoring) matter less. Context engineering: ADRs, specs and boundaries become the context you feed agents. Harness engineering: guidance so agents work autonomously. Boundary rules are the guardrails agents hit on the next lint/typecheck. Avoid full spec-driven development (a waterfall that ignores what you learn while building) — aim for "just-enough architecture," then iterate. AI builds the structure; deciding where the boundary goes stays human.</p></aside>
+    <p class="say frag" style="max-width:52ch">Boundaries = <b>guardrails</b> for agents; docs = <b>context</b>. Judgment is worth <b>more</b>.</p>
+    <aside class="notes"><div class="t">Modern angle</div><p>Fundamentals grow more important with AI. Context engineering: ADRs, specs, boundaries feed agents. Boundary rules are the guardrails on the next lint. Aim for just-enough architecture, not full spec-driven.</p></aside>
   </section>
 
-  <!-- 24 · REFERENCE IMPL -->
+  <!-- 25 · REFERENCE IMPL -->
   <section class="slide">
     <div class="kicker">Reference implementation</div>
     <h2>All three stages, one repo</h2>
     <div class="fig" style="max-width:640px">
-      <svg viewBox="0 0 640 170">
-        <rect x="180" y="12" width="280" height="40" rx="10" fill="#e9f1fc" stroke="#2f6fd6"/><text x="320" y="37" text-anchor="middle" fill="#2c2822" font-weight="700" font-size="14">app-shell · host</text>
+      <svg viewBox="0 0 640 175">
+        <g stroke="#c7bda6" stroke-width="1.8" fill="none"><path class="draw" pathLength="1" d="M290 52 L140 82"/><path class="draw" pathLength="1" d="M320 52 L320 82"/></g>
+        <path class="draw" pathLength="1" d="M350 52 L500 82" stroke="#df5b45" stroke-width="1.8" stroke-dasharray="4 4" fill="none"/>
+        <rect class="hn" x="180" y="12" width="280" height="40" rx="10" fill="#fbe7e2" stroke="#df5b45"/><text x="320" y="37" text-anchor="middle" fill="#20242e" font-weight="700" font-size="14">app-shell · host</text>
         <g text-anchor="middle" font-size="13" font-weight="700">
-          <rect x="70" y="80" width="140" height="36" rx="8" fill="#eaf6ef" stroke="#2e9e69"/><text x="140" y="103" fill="#2c2822">catalog</text>
-          <rect x="250" y="80" width="140" height="36" rx="8" fill="#eaf6ef" stroke="#2e9e69"/><text x="320" y="103" fill="#2c2822">orders</text>
-          <rect x="430" y="80" width="140" height="36" rx="8" fill="#e9f1fc" stroke="#2f6fd6" stroke-dasharray="4 4"/><text x="500" y="98" fill="#2c2822" font-size="12">analytics</text><text x="500" y="112" fill="#7c7266" font-size="10">remote · MF</text>
-          <rect x="150" y="132" width="340" height="30" rx="8" fill="#f3eefb" stroke="#7c4dd6"/><text x="320" y="152" fill="#7c4dd6" font-size="12">platform · ui · shared · authentication</text>
+          <rect class="hn" x="70" y="82" width="140" height="36" rx="8" fill="#eef0dd" stroke="#6f7d3f"/><text x="140" y="105" fill="#20242e">catalog</text>
+          <rect class="hn" x="250" y="82" width="140" height="36" rx="8" fill="#eef0dd" stroke="#6f7d3f"/><text x="320" y="105" fill="#20242e">orders</text>
+          <rect class="hn" x="430" y="82" width="140" height="36" rx="8" fill="#fbe7e2" stroke="#df5b45" stroke-dasharray="4 4"/><text x="500" y="100" fill="#20242e" font-size="12">analytics</text><text x="500" y="113" fill="#6f6a5e" font-size="10">remote · MF</text>
+          <rect x="150" y="134" width="340" height="30" rx="8" fill="#f2e6ea" stroke="#8a5a6a"/><text x="320" y="154" fill="#8a5a6a" font-size="12">platform · ui · shared · authentication</text>
         </g>
-        <g stroke="#cabfa9" stroke-width="1.6"><line x1="290" y1="52" x2="140" y2="80"/><line x1="320" y1="52" x2="320" y2="80"/></g>
-        <line x1="350" y1="52" x2="500" y2="80" stroke="#2f6fd6" stroke-width="1.6" stroke-dasharray="4 4"/>
       </svg>
     </div>
     <p class="key g">Boundaries enforced 3 ways — <b>all pass in CI ✓</b>. Build-time modules + runtime remote.</p>
-    <aside class="notes"><div class="t">Reference implementation</div><p>The talk, built for real. The app-shell composes catalog and orders at build time and loads the analytics remote at runtime via Module Federation. Offer a live walkthrough of the boundary configs.</p></aside>
+    <aside class="notes"><div class="t">Reference implementation</div><p>Built for real: app-shell composes catalog + orders at build time and loads analytics at runtime via Module Federation. Offer a live walkthrough.</p></aside>
   </section>
 
-  <!-- 25 · REPOS -->
+  <!-- 26 · REPOS -->
   <section class="slide">
     <div class="kicker">Explore the code</div>
     <h2>It's all on GitHub</h2>
-    <div class="row" style="margin-top:18px; flex-direction:column; align-items:stretch; max-width:780px; width:100%">
+    <div class="row" style="margin-top:18px; flex-direction:column; align-items:stretch; max-width:820px; width:100%">
       <div class="chip frag a" style="text-align:left"><a class="link" href="https://github.com/eng-AhmedMahmoud/fem-frontend-architecture" target="_blank">fem-frontend-architecture</a><small>workshop index + C4 diagrams v1 → v3</small></div>
       <div class="chip frag g" style="text-align:left"><a class="link" href="https://github.com/eng-AhmedMahmoud/commerceos-frontend-architecture" target="_blank">commerceos-frontend-architecture</a><small>all 3 stages in one runnable monorepo — installs, builds, boundaries pass</small></div>
       <div class="chip frag" style="text-align:left"><small style="color:var(--muted)">+ staged repos: frontend-architecture-<b>monolith</b> · <b>monorepo</b> · <b>micro-frontends</b></small></div>
     </div>
-    <aside class="notes"><div class="t">Explore the code</div><p>Index repo carries the versioned C4 diagrams; commerceos carries the enforced code; the three staged repos mirror the course progression. Offer to open any of them live.</p></aside>
+    <aside class="notes"><div class="t">Explore the code</div><p>Index repo carries the C4 diagrams; commerceos carries the enforced code; the staged repos mirror the progression.</p></aside>
   </section>
 
-  <!-- 26 · CLOSE -->
-  <section class="slide">
+  <!-- 27 · CLOSE -->
+  <section class="slide" style="justify-content:center">
     <div class="kicker">Close</div>
-    <h2>Your turn</h2>
-    <p class="big" style="font-size:min(3.8vw,44px); max-width:26ch">A 6-person startup wants micro-frontends "to scale."<br><span class="w">What do you tell them?</span></p>
+    <h2 style="max-width:24ch">Your turn</h2>
+    <p class="big" style="font-size:min(3.8vw,44px); max-width:26ch; margin-top:14px">A 6-person startup wants micro-frontends "to scale." <span class="w">What do you tell them?</span></p>
     <p class="key g frag">No autonomy pain yet → a <b>modular monolith</b> with enforced boundaries. Earn micro-frontends later.</p>
     <p class="say" style="margin-top:16px">Thank you — questions?</p>
-    <aside class="notes"><div class="t">Close on a question</div><p>Let them answer first, then confirm: no deploy-autonomy pain yet → modular monolith, enforce boundaries, distribute only when coordination cost passes distribution cost. Ending on a question the room answers proves the lesson landed.</p></aside>
+    <aside class="notes"><div class="t">Close on a question</div><p>Let them answer first, then confirm.</p></aside>
   </section>
 
 </div>
