@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speaker Cheat-Sheet · Frontend Architecture Lesson</title>
+<style>
+  :root{ --ink:#141a21; --mut:#5a6773; --line:#d5deea; --a:#0b64d6; --g:#1a7f37; --r:#c02626; --w:#a5670b; --arch:#7c3aed; --bg:#fff; --chip:#eef3fb; }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font:11px/1.38 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#f3f5f9; padding:18px}
+  .page{max-width:1140px; margin:0 auto; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:22px 26px; box-shadow:0 4px 18px rgba(20,40,70,.08)}
+  header{display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--ink); padding-bottom:8px; margin-bottom:11px}
+  h1{font-size:17px; letter-spacing:-.3px} .meta{color:var(--mut); font-size:10.5px}
+  .thesis{background:var(--chip); border-left:4px solid var(--a); border-radius:0 8px 8px 0; padding:7px 12px; margin-bottom:12px; font-size:12px}
+  .thesis b{color:var(--a)}
+  .grid{columns:2; column-gap:22px}
+  .row{break-inside:avoid; display:grid; grid-template-columns:22px 1fr; gap:7px; padding:4px 0; border-bottom:1px dashed var(--line)}
+  .n{width:20px; height:20px; border-radius:5px; background:var(--a); color:#fff; display:grid; place-items:center; font-weight:800; font-size:10px}
+  .n.p1{background:var(--g)} .n.p2{background:var(--arch)}
+  .ttl{font-weight:700; font-size:11.5px}
+  .say{color:var(--ink); font-size:10.5px; margin-top:1px}
+  .say b{color:var(--a)}
+  .foot{display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px; margin-top:12px}
+  .card{border:1px solid var(--line); border-radius:9px; padding:8px 10px; break-inside:avoid}
+  .card h3{font-size:10px; text-transform:uppercase; letter-spacing:.6px; color:var(--a); margin-bottom:4px}
+  .card.g h3{color:var(--g)} .card.r h3{color:var(--r)}
+  .card li{margin-left:12px; margin-bottom:2px; font-size:10.5px}
+  code{background:#0d1117; color:#e6edf3; padding:1px 4px; border-radius:4px; font:9.5px "SF Mono",Menlo,monospace}
+  .tt{color:var(--mut); font-size:9.5px; text-align:right; margin-top:9px}
+  @media print{ body{background:#fff; padding:0} .page{border:none; box-shadow:none; border-radius:0; max-width:none} @page{margin:10mm} }
+  .print{position:fixed; bottom:16px; right:16px; background:var(--a); color:#fff; border:none; padding:9px 15px; border-radius:99px; font-size:12px; font-weight:600; cursor:pointer}
+  @media print{.print{display:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Frontend Architecture — Private Speaker Cheat-Sheet</h1>
+    <span class="meta">26 slides · CommerceOS · ~30 min</span>
+  </header>
+
+  <div class="thesis"><b>Thesis:</b> trade <b style="color:var(--w)">complexity</b> for <b style="color:var(--g)">scalability</b> → pick the <b>least-worst</b> fit. <b>Increase modularity BEFORE distributing.</b> Move up only when growing pains force it.</div>
+
+  <div class="grid">
+    <div class="row"><div class="n">1</div><div><div class="ttl">Title — CommerceOS</div><div class="say">"We architect frontend, not just write it. One app, monolith → micro-frontends."</div></div></div>
+    <div class="row"><div class="n">2</div><div><div class="ttl">Big idea</div><div class="say">Every step up in scale costs complexity. No "best" — least-worst fit.</div></div></div>
+    <div class="row"><div class="n">3</div><div><div class="ttl">What is architecture</div><div class="say">Decisions to organize a system for the qualities you want. Drivers: goals / qualities / constraints. Biggest = team size.</div></div></div>
+    <div class="row"><div class="n">4</div><div><div class="ttl">4 pillars (RPG)</div><div class="say">Style · Characteristics · Decisions · Components. Score each stage.</div></div></div>
+    <div class="row"><div class="n">5</div><div><div class="ttl">Journey</div><div class="say">Monolith → Monorepo → MFE, by team growth. Monorepo is a helper, not a style.</div></div></div>
+    <div class="row"><div class="n">6</div><div><div class="ttl">CommerceOS + C4</div><div class="say">React/TanStack/Vite. C4 = Context→Container→Component→Code.</div></div></div>
+    <div class="row"><div class="n p1">7</div><div><div class="ttl">Monolith</div><div class="say">Right default. Weak stat = scalability. Problem = <i>unstructured</i> monolith.</div></div></div>
+    <div class="row"><div class="n p1">8</div><div><div class="ttl">Big ball of mud</div><div class="say">Shared order-line-items table breaks customers app; tooltip-on-timeout hides it from tests.</div></div></div>
+    <div class="row"><div class="n p1">9</div><div><div class="ttl">The trap 🔑</div><div class="say">2 axes: deploy units × modularity. Units without modularity = <i>distributed monolith</i>. Modularity FIRST.</div></div></div>
+    <div class="row"><div class="n p1">10</div><div><div class="ttl">Modular monolith + DDD</div><div class="say">Subdomains → modules. Core (orders/catalog), supporting (inventory/customers/analytics), generic (auth). Consistency &gt; perfect.</div></div></div>
+    <div class="row"><div class="n p1">11</div><div><div class="ttl">Organization + encapsulation</div><div class="say">Folders are half. Encapsulation (deps point down, no sibling imports) is the other half — must be enforced.</div></div></div>
+    <div class="row"><div class="n p1">12</div><div><div class="ttl">Enforce in CI</div><div class="say"><code>eslint-plugin-boundaries</code>, default:disallow, capture moduleName, allow types, auth exception → sibling import fails CI. + Dependency Cruiser.</div></div></div>
+    <div class="row"><div class="n p2">13</div><div><div class="ttl">Monorepo (Triple-M)</div><div class="say">3 steps: workspace→packages→tooling. app-shell + app/module + packages(ui/shared/tooling). <code>exports</code> = interface. One build.</div></div></div>
+    <div class="row"><div class="n p2">14</div><div><div class="ttl">Turborepo</div><div class="say">Cache (9s→18ms) + orchestration (<code>dependsOn ^build</code>, <code>outputs</code>). Tags deny platform→module; catches cycles.</div></div></div>
+    <div class="row"><div class="n p2">15</div><div><div class="ttl">Where monorepo stops</div><div class="say">Remaining pains: release queue (15-min build, one at a time) + no runtime component sharing.</div></div></div>
+    <div class="row"><div class="n p2">16</div><div><div class="ttl">When MFE</div><div class="say">Independent deploys / diverging drivers. Vertical (route) vs horizontal (view part). Adopt when coordination cost &gt; distribution cost.</div></div></div>
+    <div class="row"><div class="n p2">17</div><div><div class="ttl">Flavors + cheat</div><div class="say">iframes / web components / Module Federation. Vertical→DIY proxy · isolation→iframes · Next→multi-zones · else→Module Federation.</div></div></div>
+    <div class="row"><div class="n p2">18</div><div><div class="ttl">Module Federation</div><div class="say">Host loads remotes via <code>remoteEntry.js</code>; React <b>singleton</b> (context). <code>lazy</code>+Suspense+ErrorBoundary; <b>don't forget await</b>. Cross-framework → migration.</div></div></div>
+    <div class="row"><div class="n p2">19</div><div><div class="ttl">Keep decoupled</div><div class="say">Component=reuse, MFE=independence → few props. Nanostores: expose a <b>listener</b>, not the atom. MF2.0 auto-types + <code>mf-manifest.json</code> = discovery.</div></div></div>
+    <div class="row"><div class="n">20</div><div><div class="ttl">The cost</div><div class="say">CSS conflicts → <b>Tailwind</b> (atomic). Dup deps, version skew, many pipelines. Adopt via cost analysis.</div></div></div>
+    <div class="row"><div class="n">21</div><div><div class="ttl">Decision framework</div><div class="say">Match pattern to pain. Modularity before distribution. Smallest fix wins. <i>(pause — photo slide)</i></div></div></div>
+    <div class="row"><div class="n">22</div><div><div class="ttl">Architecture &amp; AI</div><div class="say">Fundamentals matter MORE. Docs/boundaries = context; lint = guardrails. Just-enough architecture, not full spec-driven.</div></div></div>
+    <div class="row"><div class="n">23</div><div><div class="ttl">Reference impl (diagram)</div><div class="say">All 3 stages in one repo: app-shell host + catalog/orders (build-time) + analytics remote (Module Federation) over the platform layer. Boundaries enforced 3 ways ✓.</div></div></div>
+    <div class="row"><div class="n">24</div><div><div class="ttl">Explore the code (2 repos)</div><div class="say">Index + C4 diagrams v1→v3: <code>github.com/eng-AhmedMahmoud/fem-frontend-architecture</code>. Implementation (installs/builds/boundaries pass): <code>…/commerceos-frontend-architecture</code>.</div></div></div>
+    <div class="row"><div class="n">25</div><div><div class="ttl">Recap</div><div class="say">Six lines — decisions / pillars / modular monolith / monorepo / MFE / match-the-pain.</div></div></div>
+    <div class="row"><div class="n">26</div><div><div class="ttl">Close — their turn</div><div class="say">"6-person startup wants MFE 'to scale' — your call?" Let them answer → modular monolith, earn MFE later. "Questions?"</div></div></div>
+  </div>
+
+  <div class="foot">
+    <div class="card g"><h3>Decision cheat</h3>
+      <ul><li>Messy app, 1 team → <b>modular monolith</b></li><li>Apps share code → <b>monorepo</b></li><li>Teams blocked on deploys → <b>micro-frontends</b></li><li>Always: <b>modularity before distribution</b></li></ul>
+    </div>
+    <div class="card"><h3>Terms to drop confidently</h3>
+      <ul><li>big ball of mud · distributed monolith</li><li>DDD subdomains (core/supporting/generic)</li><li><code>eslint-plugin-boundaries</code> · Dependency Cruiser</li><li>Turbo tags · Module Federation · <code>remoteEntry.js</code></li><li>React singleton · Nanostores · <code>mf-manifest.json</code></li></ul>
+    </div>
+    <div class="card r"><h3>If running long, cut</h3>
+      <ul><li>Slide 22 (AI) first · then 15 · then 17</li><li>Protect: 2, 9, 10, 12, 18, 21</li><li>~30 min at ~1.2 min/slide</li></ul>
+    </div>
+  </div>
+  <div class="tt">This sheet is private — it is NOT part of the deck. The deck itself shows no notes/timers. Press <b>S</b> in the deck for the same notes on-screen.</div>
+</div>
+<button class="print" onclick="window.print()">Print / PDF</button>
+</body>
+</html>
