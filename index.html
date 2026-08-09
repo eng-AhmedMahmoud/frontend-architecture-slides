@@ -1069,7 +1069,105 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The decision list — memorise this one</div><p>This is the slide to have ready when someone asks "so which one would you use?" It's ordered by cost, cheapest first, and the honest answer is usually near the top.</p><p><b>DIY route-based</b>: if every micro-frontend owns whole routes, you need a proxy and separate deployments — no library, no runtime negotiation, nothing to upgrade. Most teams asking for micro-frontends actually need this. <b>iframes</b>: the only option giving true CSS/JS isolation, so it wins when embedding third-party or genuinely hostile code; you pay in routing, sizing and auth plumbing. <b>Next.js multi-zones</b>: if you're already on Next, it's built in — adding Module Federation on top is a common and expensive mistake. <b>Piral</b>: real, opinionated, much smaller community — fine if you want the app-shell decisions made for you, but call the bet out loud. <b>Module Federation</b>: the general answer when you need horizontal composition with shared dependencies, which is why it's last, not first.</p><p>Saying "start with a proxy" in an interview signals more seniority than naming the most sophisticated tool.</p></aside>
   </section>
 
-  <!-- 36 · MODULE FEDERATION (flow + teams) -->
+  <!-- 36 · LOCAL DEV · THE SHELL IS A PROXY -->
+  <section class="slide">
+    <div class="kicker">05 · Stage 3 · Local dev</div>
+    <h2>The shell is a <span class="accent">proxy</span></h2>
+    <div class="fig" style="max-width:780px">
+      <svg viewBox="0 0 760 236">
+        <g class="hn"><rect x="30" y="82" width="210" height="66" rx="12" fill="#fbe7e2" stroke="#df5b45" stroke-width="1.8"/>
+          <text x="135" y="110" text-anchor="middle" fill="#20242e" font-family="var(--mono)" font-weight="700" font-size="14">app-shell :3000</text>
+          <text x="135" y="130" text-anchor="middle" fill="#6f6a5e" font-size="11">host · owns the URL</text></g>
+        <g stroke="#c7bda6" stroke-width="1.8" fill="none" marker-end="url(#apx)">
+          <path class="draw" pathLength="1" d="M244 104 C 330 60, 380 40, 470 36"/>
+          <path class="draw" pathLength="1" d="M244 115 L470 115" style="animation-delay:.12s"/>
+          <path class="draw" pathLength="1" d="M244 126 C 330 170, 380 190, 470 194" style="animation-delay:.24s"/>
+        </g>
+        <g text-anchor="middle" font-family="var(--mono)" font-size="11.5" font-weight="700" fill="#8a7f68">
+          <text x="357" y="56">/analytics/</text><text x="357" y="106">/dashboard/</text><text x="357" y="188">/api</text>
+        </g>
+        <g font-family="var(--mono)" font-weight="700">
+          <g class="hn"><rect x="474" y="12" width="256" height="48" rx="10" fill="#eef0dd" stroke="#6f7d3f" stroke-width="1.6"/><text x="602" y="33" text-anchor="middle" fill="#20242e" font-size="13">analytics :3001</text><text x="602" y="49" text-anchor="middle" fill="#6f6a5e" font-size="10.5" font-weight="400">hard redirect — own page</text></g>
+          <g class="hn"><rect x="474" y="91" width="256" height="48" rx="10" fill="#eef0dd" stroke="#6f7d3f" stroke-width="1.6"/><text x="602" y="112" text-anchor="middle" fill="#20242e" font-size="13">dashboard :3005</text><text x="602" y="128" text-anchor="middle" fill="#6f6a5e" font-size="10.5" font-weight="400">&lt;iframe&gt; inside the shell</text></g>
+          <g class="hn"><rect x="474" y="170" width="256" height="48" rx="10" fill="#f4f1e8" stroke="#cfc7b3" stroke-width="1.5"/><text x="602" y="191" text-anchor="middle" fill="#6f6a5e" font-size="13">api :4000</text><text x="602" y="207" text-anchor="middle" fill="#a09781" font-size="10.5" font-weight="400">Core API</text></g>
+        </g>
+        <defs><marker id="apx" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#c7bda6"/></marker></defs>
+      </svg>
+    </div>
+    <p class="key frag">No framework — a <b>dev-server proxy</b> and separate ports. Built on <b class="arch">rsbuild / rspack</b>: webpack-compatible, so Module Federation is a first-class option when we need it.</p>
+    <aside class="notes"><div class="t">DIY route-based orchestration, for real</div><p>This is the cheapest row of the cheatsheet, running. Three independent dev servers; the shell owns <code>:3000</code> and proxies <code>/analytics/</code> to <code>:3001</code> and <code>/dashboard/</code> to <code>:3005</code>. Two different composition styles on purpose — analytics is a <b>hard redirect</b> (a whole page owned by another app) and dashboard is an <b>iframe</b> embedded inside the shell chrome. No Module Federation anywhere yet.</p><p>Press <b>C</b> and run the exercise — killing two of the four dev processes shows exactly what independent deployment buys and what it costs.</p></aside>
+    <aside class="exercise">
+      <div class="xstep">
+        <h6><i>Step 1</i>See what <code>dev</code> actually starts</h6>
+        <div class="file">package.json <span style="color:var(--muted)">· repo root</span></div>
+        <div class="cmd"><pre><span class="ty">"dev"</span>: <span class="st">"turbo dev</span>
+<span class="st">   --filter=@commerceos/api</span>
+<span class="st">   --filter=@commerceos/app-shell</span>
+<span class="st">   --filter=@commerceos/analytics</span>
+<span class="st">   --filter=@commerceos/dashboard"</span></pre><button class="copy" type="button" aria-label="Copy snippet">copy</button></div>
+        <p><b>Four processes, not one.</b> That alone is the shift — there is no single dev server that owns the app any more.</p>
+      </div>
+
+      <div class="xstep">
+        <h6><i>Step 2</i>Now start only the shell</h6>
+        <div class="cmd"><pre><span class="prompt">$</span> turbo dev \
+    --filter=@commerceos/api \
+    --filter=@commerceos/app-shell</pre><button class="copy" type="button" data-copy="turbo dev --filter=@commerceos/api --filter=@commerceos/app-shell" aria-label="Copy command">copy</button></div>
+        <p>The two remotes never boot. Nothing is listening on <code>:3001</code> or <code>:3005</code>. <b>The shell still builds and starts perfectly.</b></p>
+      </div>
+
+      <div class="xstep">
+        <h6><i>Step 3</i>Click through the app</h6>
+        <div class="out"><span class="r">GET /analytics/  → 502 Bad Gateway</span>
+[proxy] /analytics/ → http://localhost:3001
+        <span class="r">ECONNREFUSED</span></div>
+        <p><b>Sidebar → Analytics</b> runs <code>window.location.replace("/analytics/")</code> — a real navigation into the proxy — and you land on a 502.</p>
+        <p><b>The Dashboard route</b> renders <code>&lt;iframe src="/dashboard/"&gt;</code>, so you get the shell, the nav, the page chrome… and one empty rectangle where the remote should be.</p>
+        <p>Everything else — routing, command menu, other screens — <span class="good">keeps working</span>. That is the whole trade in one screen: the failure is <b>scoped to one route at runtime</b> instead of failing the build for everyone. Independent deploys and independent failures are the same coin.</p>
+      </div>
+
+      <div class="xstep">
+        <h6><i>Step 4</i>Where the wiring actually lives</h6>
+        <div class="file">packages/tooling/src/rsbuild.config.js</div>
+        <div class="cmd"><pre>server: {
+  port,
+  proxy: {
+    <span class="st">"/analytics/"</span>: { target: analyticsProxyTarget },
+    <span class="st">"/dashboard/"</span>: { target: dashboardProxyTarget },
+    <span class="st">"/api"</span>:        { target: apiTarget },
+    <span class="cmt">// each also sets changeOrigin: true</span>
+  },
+},</pre><button class="copy" type="button" aria-label="Copy snippet">copy</button></div>
+        <div class="file">apps/app-shell/rsbuild.config.js</div>
+        <div class="cmd"><pre><span class="fn">createRsbuildConfig</span>({
+  port: <span class="kw">3000</span>,
+  analyticsProxyTarget: <span class="st">"http://localhost:3001"</span>,
+  dashboardProxyTarget: <span class="st">"http://localhost:3005"</span>,
+});</pre><button class="copy" type="button" aria-label="Copy snippet">copy</button></div>
+        <p>One shared factory; every app calls it with just its port. <b>Only the shell passes proxy targets</b> — that single fact is what makes it the host. Analytics and dashboard set <code>assetPrefix: "/analytics/"</code> so their own chunks still resolve when served behind the shell's path.</p>
+        <p>In production those targets become real URLs. <b>No application code changes</b> — the composition is entirely configuration.</p>
+      </div>
+
+      <div class="xstep">
+        <h6><i>Step 5</i>Why rsbuild, not Vite</h6>
+        <p><b>rsbuild</b> is built on <b>rspack</b> — a Rust reimplementation of webpack that is API-compatible with it. That compatibility is the point: <b>Module Federation is a webpack construct</b>, and rspack supports it natively as a first-class config option rather than an emulation.</p>
+        <p>Vite reaches Module Federation through a community plugin that recreates webpack's runtime, and it's the rough edges that bite — shared-dependency negotiation, SSR, and HMR across independently running remotes. You also keep webpack's plugin ecosystem, and because the core is Rust the dev experience gets <i>faster</i>, not slower.</p>
+        <div class="file">packages/tooling/src/rsbuild.config.js <span style="color:var(--muted)">· the seam is already there</span></div>
+        <div class="cmd"><pre>moduleFederation: moduleFederation
+  ? { options: moduleFederation }
+  : <span class="kw">undefined</span>,</pre><button class="copy" type="button" aria-label="Copy snippet">copy</button></div>
+        <p>The factory already threads a <code>moduleFederation</code> option through. This branch simply doesn't pass one — flip that on and the same tooling becomes the Module Federation setup on the next slide.</p>
+      </div>
+
+      <div class="xstep">
+        <h6><i>Step 6</i>Put it back</h6>
+        <div class="cmd"><pre><span class="prompt">$</span> git checkout package.json &amp;&amp; npm run dev</pre><button class="copy" type="button" data-copy="git checkout package.json && npm run dev" aria-label="Copy command">copy</button></div>
+        <p>All four processes return, and both remotes light up again.</p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 37 · MODULE FEDERATION (flow + teams) -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Module Federation</h2>
@@ -1089,7 +1187,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Core mechanism</div><p>A host loads remotes at runtime via a generated remoteEntry.js. `shared` negotiates deps — React must be a singleton or context breaks. lazy + Suspense + error boundary; the classic bug is forgetting to await. Host and remotes can be different frameworks → incremental migration.</p></aside>
   </section>
 
-  <!-- 37 · DECOUPLE -->
+  <!-- 38 · DECOUPLE -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Keep them <span class="accent">independent</span></h2>
@@ -1102,7 +1200,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Independence is the point</div><p>Comms: postMessage / props / events / signals. A component is about reuse, a micro-frontend about independence. Nanostores: the remote owns the atom, exposes a listener. MF 2.0 auto-types + mf-manifest.json = service discovery (AWS, Vercel schemas too).</p></aside>
   </section>
 
-  <!-- 38 · COST -->
+  <!-- 39 · COST -->
   <section class="slide">
     <div class="kicker">06 · The catch</div>
     <h2 class="r">Micro-frontends aren't free</h2>
@@ -1115,7 +1213,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Honesty = senior signal</div><p>CSS conflicts → Tailwind atomic utilities; duplicated deps + version skew; many pipelines. Adopt from a cost analysis.</p></aside>
   </section>
 
-  <!-- 39 · DECISION FRAMEWORK -->
+  <!-- 40 · DECISION FRAMEWORK -->
   <section class="slide">
     <div class="kicker">06 · The payoff</div>
     <h2>Match the pattern to the <span class="accent">pain</span></h2>
@@ -1137,7 +1235,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The takeaway</div><p>The whole course in one table. Always raise modularity before distributing. Smallest architecture that removes the pain wins.</p></aside>
   </section>
 
-  <!-- 40 · AI -->
+  <!-- 41 · AI -->
   <section class="slide">
     <div class="kicker">07 · Modern angle</div>
     <h2 class="ai">Architecture &amp; AI</h2>
@@ -1149,7 +1247,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Modern angle</div><p>Fundamentals grow more important with AI. Context engineering: ADRs, specs, boundaries feed agents. Boundary rules are the guardrails on the next lint. Aim for just-enough architecture, not full spec-driven.</p></aside>
   </section>
 
-  <!-- 41 · REFERENCE IMPL -->
+  <!-- 42 · REFERENCE IMPL -->
   <section class="slide">
     <div class="kicker">Reference implementation</div>
     <h2>All three stages, one repo</h2>
@@ -1170,7 +1268,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Reference implementation</div><p>Built for real: app-shell composes catalog + orders at build time and loads analytics at runtime via Module Federation. Offer a live walkthrough.</p></aside>
   </section>
 
-  <!-- 42 · REPOS -->
+  <!-- 43 · REPOS -->
   <section class="slide">
     <div class="kicker">Explore the code</div>
     <h2>It's all on GitHub</h2>
@@ -1182,7 +1280,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Explore the code</div><p>Index repo carries the C4 diagrams; commerceos carries the enforced code; the staged repos mirror the progression.</p></aside>
   </section>
 
-  <!-- 43 · CLOSE -->
+  <!-- 44 · CLOSE -->
   <section class="slide" style="justify-content:center">
     <div class="kicker">Close</div>
     <h2 style="max-width:24ch">Your turn</h2>
