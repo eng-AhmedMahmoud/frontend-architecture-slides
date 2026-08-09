@@ -1048,11 +1048,28 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
       <div class="chip frag arch">Web Components<small>runtime + isolation</small></div>
       <div class="chip frag g">Module Federation<small>runtime code-sharing · default</small></div>
     </div>
-    <p class="key frag">Split <b>vertical</b> (by route) or <b>horizontal</b> (part of a view). Cheat: vertical-only → <b>DIY proxy</b> · isolation → iframes · Next.js → multi-zones · else → Module Federation.</p>
+    <p class="key frag">Split <b>vertical</b> (by route) or <b>horizontal</b> (part of a view) — settle that before you pick a flavor.</p>
     <aside class="notes"><div class="t">The menu</div><p>Decide the split (vertical/horizontal), routing/rendering/composition, isolation. Flavors: iframes, web components, native (import maps/ESI), fragment libs (single-spa — unmaintained; Qwik), route-based (Cloudflare, Next multi-zones), Module Federation. Build raw first (DIY: ports + proxy + iframe, same-origin state).</p></aside>
   </section>
 
-  <!-- 35 · MODULE FEDERATION (flow + teams) -->
+  <!-- 35 · MICRO-FRONTENDS CHEATSHEET -->
+  <section class="slide">
+    <div class="kicker">05 · Stage 3 · Pick one</div>
+    <h2>Micro-Frontends Cheatsheet</h2>
+    <style>.cheat li b.ans{color:var(--coral)}
+      .cheat li{padding:8px 0 8px 40px}</style>
+    <ul class="plist cheat" style="max-width:none; margin-top:8px">
+      <li class="frag">If a <b>vertical split</b> is enough → <b class="ans">DIY route-based orchestration</b><small>a proxy in front of separately deployed apps — no framework at all</small></li>
+      <li class="frag">If you need a <b>horizontal split</b> with full isolation → <b class="ans">iframes</b><small>a hard wall · <code>postMessage</code> · you accept the ergonomics on purpose</small></li>
+      <li class="frag">If you're on <b>Next.js</b> → <b class="ans">Multi-zones</b><small>already in the framework — don't bolt a second system onto it</small></li>
+      <li class="frag">If you're feeling <b>experimental</b> → <b class="ans">Piral</b><small>opinionated app-shell framework — know that you're betting on it</small></li>
+      <li class="frag">Otherwise → <b class="ans">Module Federation</b><small>runtime code-sharing · framework-agnostic · the sane default</small></li>
+    </ul>
+    <p class="key frag">Read top-down, stop at the first match. Module Federation is the <b>fallback</b>, not the goal — if a proxy and two deployments solve it, you're done.</p>
+    <aside class="notes"><div class="t">The decision list — memorise this one</div><p>This is the slide to have ready when someone asks "so which one would you use?" It's ordered by cost, cheapest first, and the honest answer is usually near the top.</p><p><b>DIY route-based</b>: if every micro-frontend owns whole routes, you need a proxy and separate deployments — no library, no runtime negotiation, nothing to upgrade. Most teams asking for micro-frontends actually need this. <b>iframes</b>: the only option giving true CSS/JS isolation, so it wins when embedding third-party or genuinely hostile code; you pay in routing, sizing and auth plumbing. <b>Next.js multi-zones</b>: if you're already on Next, it's built in — adding Module Federation on top is a common and expensive mistake. <b>Piral</b>: real, opinionated, much smaller community — fine if you want the app-shell decisions made for you, but call the bet out loud. <b>Module Federation</b>: the general answer when you need horizontal composition with shared dependencies, which is why it's last, not first.</p><p>Saying "start with a proxy" in an interview signals more seniority than naming the most sophisticated tool.</p></aside>
+  </section>
+
+  <!-- 36 · MODULE FEDERATION (flow + teams) -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Module Federation</h2>
@@ -1072,7 +1089,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Core mechanism</div><p>A host loads remotes at runtime via a generated remoteEntry.js. `shared` negotiates deps — React must be a singleton or context breaks. lazy + Suspense + error boundary; the classic bug is forgetting to await. Host and remotes can be different frameworks → incremental migration.</p></aside>
   </section>
 
-  <!-- 36 · DECOUPLE -->
+  <!-- 37 · DECOUPLE -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Keep them <span class="accent">independent</span></h2>
@@ -1085,7 +1102,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Independence is the point</div><p>Comms: postMessage / props / events / signals. A component is about reuse, a micro-frontend about independence. Nanostores: the remote owns the atom, exposes a listener. MF 2.0 auto-types + mf-manifest.json = service discovery (AWS, Vercel schemas too).</p></aside>
   </section>
 
-  <!-- 37 · COST -->
+  <!-- 38 · COST -->
   <section class="slide">
     <div class="kicker">06 · The catch</div>
     <h2 class="r">Micro-frontends aren't free</h2>
@@ -1098,7 +1115,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Honesty = senior signal</div><p>CSS conflicts → Tailwind atomic utilities; duplicated deps + version skew; many pipelines. Adopt from a cost analysis.</p></aside>
   </section>
 
-  <!-- 38 · DECISION FRAMEWORK -->
+  <!-- 39 · DECISION FRAMEWORK -->
   <section class="slide">
     <div class="kicker">06 · The payoff</div>
     <h2>Match the pattern to the <span class="accent">pain</span></h2>
@@ -1120,7 +1137,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The takeaway</div><p>The whole course in one table. Always raise modularity before distributing. Smallest architecture that removes the pain wins.</p></aside>
   </section>
 
-  <!-- 39 · AI -->
+  <!-- 40 · AI -->
   <section class="slide">
     <div class="kicker">07 · Modern angle</div>
     <h2 class="ai">Architecture &amp; AI</h2>
@@ -1132,7 +1149,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Modern angle</div><p>Fundamentals grow more important with AI. Context engineering: ADRs, specs, boundaries feed agents. Boundary rules are the guardrails on the next lint. Aim for just-enough architecture, not full spec-driven.</p></aside>
   </section>
 
-  <!-- 40 · REFERENCE IMPL -->
+  <!-- 41 · REFERENCE IMPL -->
   <section class="slide">
     <div class="kicker">Reference implementation</div>
     <h2>All three stages, one repo</h2>
@@ -1153,7 +1170,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Reference implementation</div><p>Built for real: app-shell composes catalog + orders at build time and loads analytics at runtime via Module Federation. Offer a live walkthrough.</p></aside>
   </section>
 
-  <!-- 41 · REPOS -->
+  <!-- 42 · REPOS -->
   <section class="slide">
     <div class="kicker">Explore the code</div>
     <h2>It's all on GitHub</h2>
@@ -1165,7 +1182,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Explore the code</div><p>Index repo carries the C4 diagrams; commerceos carries the enforced code; the staged repos mirror the progression.</p></aside>
   </section>
 
-  <!-- 42 · CLOSE -->
+  <!-- 43 · CLOSE -->
   <section class="slide" style="justify-content:center">
     <div class="kicker">Close</div>
     <h2 style="max-width:24ch">Your turn</h2>
