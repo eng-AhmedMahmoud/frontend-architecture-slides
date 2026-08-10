@@ -424,7 +424,9 @@
 
   <span class="cmt">// encapsulation — deps point DOWN; features never import siblings</span>
 </pre>
-    <aside class="notes"><div class="t">The missing half</div><p>Encapsulation is familiar from OOP private members, closures, ES-module exports. Architecture has none built in — we create the boundaries. Types: module, layer, information-hiding via interface. Other langs: ArchUnit; JS: ESLint rules.</p></aside>
+    <div class="cmd" style="margin-top:16px"><pre><span class="prompt">$</span> git checkout modular-monolith</pre><button class="copy" type="button" data-copy="git checkout modular-monolith" aria-label="Copy command">copy</button></div>
+    <p class="key">Check out the <code>modular-monolith</code> branch to see this structure live in the repo.</p>
+    <aside class="notes"><div class="t">The missing half</div><p>Switch to the <code>modular-monolith</code> branch and walk the tree — same app as the monolith branch, now split into <code>src/modules/*</code> plus <code>src/shared/*</code>.</p><p>Encapsulation is familiar from OOP private members, closures, ES-module exports. Architecture has none built in — we create the boundaries. Types: module, layer, information-hiding via interface. Other langs: ArchUnit; JS: ESLint rules.</p></aside>
   </section>
 
   <!-- 14 · ENCAPSULATION YOU ALREADY KNOW -->
