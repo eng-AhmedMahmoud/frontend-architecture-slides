@@ -1,0 +1,5 @@
+# Presenter deck — speaker notes stay local, never published to GitHub Pages.
+index.notes.html
+
+package-lock.json
+.DS_Store
