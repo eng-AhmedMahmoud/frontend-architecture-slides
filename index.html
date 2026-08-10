@@ -957,7 +957,74 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The picture that earns stage 3</div><p>Third and last C4 container view. Catalog, Orders, Insights and Marketplace are now separate services behind a TypeScript BFF, each with a team behind it. The backend has finished doing what we spent this whole talk arguing for: it split along domain lines and each piece ships on its own schedule.</p><p>Now point at the top of the diagram: <b>the frontend is still one deployable box.</b> Four teams own backend services independently and then queue behind a single admin app build to get their UI out. That asymmetry is the entire micro-frontend argument, and it's visible in the picture rather than asserted on a bullet.</p></aside>
   </section>
 
-  <!-- 30 · MFE GROWING PAINS -->
+  <!-- 30 · CHARACTER SHEET · MICRO-FRONTENDS -->
+  <section class="slide">
+    <div class="kicker">05 · Stage 3 · Micro-frontends</div>
+    <h2 style="font-size:min(6.4vw,74px)">Character Sheet</h2>
+    <style>.cs-mfe{grid-template-columns:.95fr 1.15fr 1fr}
+      .cs-mfe .cs-decisions{font-size:min(1.5vw,17px); line-height:1.65}</style>
+    <div class="cs-grid cs-mfe">
+      <div class="cs-col">
+        <div class="cs-label">Architectural Style</div>
+        <div class="cs-val">Micro-Frontend SPA</div>
+        <div class="cs-label">Architectural Characteristics</div>
+        <div class="cs-stat">Simplicity <span class="cs-bar"><i style="width:40%;background:#c94b34;animation-delay:.1s"></i></span></div>
+        <div class="cs-stat">Deployability <span class="cs-bar"><i style="width:60%;background:#b07d1a;animation-delay:.2s"></i></span></div>
+        <div class="cs-stat">Maintainability <span class="cs-bar"><i style="width:60%;background:#b07d1a;animation-delay:.3s"></i></span></div>
+        <div class="cs-stat">Performance <span class="cs-bar"><i style="width:60%;background:#b07d1a;animation-delay:.4s"></i></span></div>
+        <div class="cs-stat">Scalability <span class="cs-bar"><i style="width:100%;background:#6f7d3f;animation-delay:.5s"></i></span></div>
+      </div>
+      <div class="cs-col">
+        <div class="cs-label">Logical Components</div>
+        <div class="cs-val">Apps<br>Packages<br>Hosts<br>Remotes</div>
+        <div class="cs-label">Architectural Decisions</div>
+        <div class="cs-val cs-decisions">Horizontal / Vertical Split<br>Micro-Frontend Modularity<br>Micro-Frontend Communication<br>Runtime Client-Side Composition</div>
+      </div>
+      <div class="cs-art">
+        <!-- hand-drawn floating archipelago — the monolith tower, broken apart -->
+        <svg viewBox="0 0 300 320" class="ink">
+          <g fill="none" stroke="#5a5346" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+            <!-- chains between islands -->
+            <g stroke-width="1.3">
+              <path d="M92 156 Q 100 180 108 180"/>
+              <path d="M198 180 Q 210 162 216 148"/>
+              <path d="M150 252 L 142 272"/>
+            </g>
+            <!-- left island -->
+            <path d="M22 152 Q 57 142 92 152 L 58 204 Z"/>
+            <path d="M46 152 L46 126 L66 126 L66 152"/>
+            <path d="M41 126 L56 110 L71 126"/>
+            <rect x="52" y="134" width="9" height="10" rx="1"/>
+            <!-- centre island (largest) -->
+            <path d="M104 180 Q 152 168 200 180 L 150 252 Z"/>
+            <path d="M126 180 L126 142 L172 142 L172 180"/>
+            <path d="M120 142 L149 116 L178 142"/>
+            <path d="M176 180 L176 152 L194 152 L194 180"/>
+            <path d="M172 152 L185 138 L198 152"/>
+            <rect x="134" y="152" width="11" height="12" rx="1"/>
+            <rect x="153" y="152" width="11" height="12" rx="1"/>
+            <path d="M149 116 L149 100"/><path d="M149 100 L166 106 L149 112"/>
+            <!-- right island -->
+            <path d="M214 146 Q 250 136 286 146 L 250 192 Z"/>
+            <path d="M238 146 L238 118 L260 118 L260 146"/>
+            <path d="M233 118 L249 102 L265 118"/>
+            <rect x="244" y="126" width="9" height="10" rx="1"/>
+            <!-- hanging shard -->
+            <path d="M124 272 Q 142 266 160 272 L 142 296 Z"/>
+            <!-- loose debris -->
+            <g stroke-width="1.5">
+              <path d="M84 232 L 96 228 L 90 242 Z"/>
+              <path d="M212 226 L 226 222 L 219 238 Z"/>
+              <path d="M262 246 L 274 243 L 268 256 Z"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes"><div class="t">The same sheet, three stages later</div><p>Put this next to the stage 1 sheet and read the diff — that comparison is the payoff of the whole talk.</p><p><b>Style</b>: monolithic SPA → micro-frontend SPA. <b>Simplicity collapses</b> 5/5 → 2/5 and <b>scalability climbs</b> 1/5 → 5/5, which is precisely the trade we named on slide 2: complexity for scalability. Note deployability is only 3/5, <i>lower</i> than the monolith's 5/5 — deploying one remote got easier, but deploying the <i>system</i> got harder, and that honesty is worth saying out loud. Performance also drops: more network, duplicated dependencies, runtime negotiation.</p><p><b>Logical components</b> moved from Components/Hooks/Routes/Utils — a technology split that told you nothing about the product — to Apps, Packages, Hosts and Remotes: deployment-shaped units. <b>Architectural decisions</b> were literally <code>???</code> at stage 1. Now there are four real ones, and each is a decision you must defend: how you split, how modules stay modular, how remotes talk, and where composition happens.</p><p>If someone asks "was it worth it?" — only if the scalability row is the one you actually needed.</p></aside>
+  </section>
+
+  <!-- 31 · MFE GROWING PAINS -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Micro-frontends</div>
     <h2>Growing Pains</h2>
@@ -971,7 +1038,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The stage 3 pain list</div><p>These five are the only honest reasons to reach for micro-frontends. Four are mechanical: release trains, incremental modernization of legacy areas, isolation that's enforced rather than agreed, and runtime composition of separately-owned products.</p><p>The fifth is different in kind and it's the one to slow down on — hold it for the next slide. If two teams genuinely optimize for different qualities, no single architecture serves both well.</p></aside>
   </section>
 
-  <!-- 31 · DRIVERS DIFFER (callback) -->
+  <!-- 32 · DRIVERS DIFFER (callback) -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Why that last one matters</div>
     <h2 style="font-size:min(5vw,58px)">Different drivers → different <span class="accent">architecture</span></h2>
@@ -1004,7 +1071,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Close the loop you opened in slide 3</div><p>Deliberate callback: this is the same diagram from "What is architecture?" — drivers in, decisions out. Everything so far assumed <b>one</b> set of drivers for the whole app, which is why one architecture worked.</p><p>Now make it concrete. Checkout optimizes for conversion and p75 latency; the internal analytics console optimizes for iteration speed and doesn't care about bundle size; a legacy settings area optimizes for not being touched. Different quality attributes, different constraints, different team experience → genuinely different right answers. You can force one architecture on all three, and someone always loses.</p><p>That's the real argument: micro-frontends let each team's drivers produce their own decisions. Everything else on the pain list is logistics. Now we can talk about how to adopt them.</p></aside>
   </section>
 
-  <!-- 32 · WHEN MFE -->
+  <!-- 33 · WHEN MFE -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>When micro-frontends?</h2>
@@ -1024,7 +1091,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Earn stage 3</div><p>Independent deploys, legacy updated piecemeal, diverging drivers. Adopt when coordination cost of the monolith exceeds the distributed-system cost. The dot is the crossover.</p></aside>
   </section>
 
-  <!-- 33 · QUESTIONS TO CONSIDER -->
+  <!-- 34 · QUESTIONS TO CONSIDER -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Before you split</div>
     <h2>Questions to Consider</h2>
@@ -1039,7 +1106,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The design questions — this is the senior part</div><p>Adopting micro-frontends isn't "install Module Federation." It's five decisions, and the flavour on the next slide is a <i>consequence</i> of them.</p><p><b>Split</b>: vertical means whole routes owned end-to-end — far simpler, start here. Horizontal means several teams' fragments on one screen — that's where the hard coordination lives. <b>Routing</b>: who owns the URL — the shell, a server, or a proxy at the edge? <b>Rendering</b>: CSR is the easy case; SSR across independently deployed remotes is where most of the real complexity appears. <b>Composition</b>: build-time composition is just a monorepo with extra steps — if you compose at build time you have not bought independent deploys, which is the trap worth naming out loud. <b>Isolation</b>: it's a dial, not a switch — iframes give hard isolation and painful sharing, a shared runtime gives easy sharing and CSS/dependency collisions.</p><p>If asked "how would you introduce micro-frontends," walking these five questions is a much stronger answer than naming a library.</p></aside>
   </section>
 
-  <!-- 34 · MFE FLAVORS -->
+  <!-- 35 · MFE FLAVORS -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Options</div>
     <h2>Flavors — start simple</h2>
@@ -1052,7 +1119,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The menu</div><p>Decide the split (vertical/horizontal), routing/rendering/composition, isolation. Flavors: iframes, web components, native (import maps/ESI), fragment libs (single-spa — unmaintained; Qwik), route-based (Cloudflare, Next multi-zones), Module Federation. Build raw first (DIY: ports + proxy + iframe, same-origin state).</p></aside>
   </section>
 
-  <!-- 35 · MICRO-FRONTENDS CHEATSHEET -->
+  <!-- 36 · MICRO-FRONTENDS CHEATSHEET -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Pick one</div>
     <h2>Micro-Frontends Cheatsheet</h2>
@@ -1069,7 +1136,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The decision list — memorise this one</div><p>This is the slide to have ready when someone asks "so which one would you use?" It's ordered by cost, cheapest first, and the honest answer is usually near the top.</p><p><b>DIY route-based</b>: if every micro-frontend owns whole routes, you need a proxy and separate deployments — no library, no runtime negotiation, nothing to upgrade. Most teams asking for micro-frontends actually need this. <b>iframes</b>: the only option giving true CSS/JS isolation, so it wins when embedding third-party or genuinely hostile code; you pay in routing, sizing and auth plumbing. <b>Next.js multi-zones</b>: if you're already on Next, it's built in — adding Module Federation on top is a common and expensive mistake. <b>Piral</b>: real, opinionated, much smaller community — fine if you want the app-shell decisions made for you, but call the bet out loud. <b>Module Federation</b>: the general answer when you need horizontal composition with shared dependencies, which is why it's last, not first.</p><p>Saying "start with a proxy" in an interview signals more seniority than naming the most sophisticated tool.</p></aside>
   </section>
 
-  <!-- 36 · LOCAL DEV · THE SHELL IS A PROXY -->
+  <!-- 37 · LOCAL DEV · THE SHELL IS A PROXY -->
   <section class="slide">
     <div class="kicker">05 · Stage 3 · Local dev</div>
     <h2>The shell is a <span class="accent">proxy</span></h2>
@@ -1167,7 +1234,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     </aside>
   </section>
 
-  <!-- 37 · MODULE FEDERATION (flow + teams) -->
+  <!-- 38 · MODULE FEDERATION (flow + teams) -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Module Federation</h2>
@@ -1187,7 +1254,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Core mechanism</div><p>A host loads remotes at runtime via a generated remoteEntry.js. `shared` negotiates deps — React must be a singleton or context breaks. lazy + Suspense + error boundary; the classic bug is forgetting to await. Host and remotes can be different frameworks → incremental migration.</p></aside>
   </section>
 
-  <!-- 38 · DECOUPLE -->
+  <!-- 39 · DECOUPLE -->
   <section class="slide">
     <div class="kicker">05 · Stage 3</div>
     <h2>Keep them <span class="accent">independent</span></h2>
@@ -1200,20 +1267,22 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Independence is the point</div><p>Comms: postMessage / props / events / signals. A component is about reuse, a micro-frontend about independence. Nanostores: the remote owns the atom, exposes a listener. MF 2.0 auto-types + mf-manifest.json = service discovery (AWS, Vercel schemas too).</p></aside>
   </section>
 
-  <!-- 39 · COST -->
+  <!-- 40 · COST -->
   <section class="slide">
     <div class="kicker">06 · The catch</div>
     <h2 class="r">Micro-frontends aren't free</h2>
     <div class="row" style="margin-top:22px">
       <div class="chip r frag">CSS conflicts<small>fix: Tailwind (atomic)</small></div>
-      <div class="chip r frag">Duplicate deps<small>version skew</small></div>
+      <div class="chip r frag">Duplicate deps<small>version skew · fix: discovery schema</small></div>
       <div class="chip r frag">Many pipelines<small>harder to debug</small></div>
     </div>
-    <p class="key w frag">Adopt from a <b>cost analysis</b>, never for novelty.</p>
+    <p class="say frag" style="max-width:62ch; margin-top:20px">Version skew has a real answer: a <b>frontend service discovery schema</b> — a manifest the host reads <b>at runtime</b> to resolve which build of each remote to load. <code>package-lock.json</code>, but for micro-frontends.</p>
+    <p class="key g frag">AWS ships one: <a class="link" href="https://github.com/awslabs/frontend-discovery-service" target="_blank">awslabs/frontend-discovery-service</a> · Module Federation 2.0's <code>mf-manifest.json</code> is the same idea.</p>
+    <p class="key w frag">The other two you mitigate. Adopt from a <b>cost analysis</b>, never for novelty.</p>
     <aside class="notes"><div class="t">Honesty = senior signal</div><p>CSS conflicts → Tailwind atomic utilities; duplicated deps + version skew; many pipelines. Adopt from a cost analysis.</p></aside>
   </section>
 
-  <!-- 40 · DECISION FRAMEWORK -->
+  <!-- 41 · DECISION FRAMEWORK -->
   <section class="slide">
     <div class="kicker">06 · The payoff</div>
     <h2>Match the pattern to the <span class="accent">pain</span></h2>
@@ -1235,7 +1304,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">The takeaway</div><p>The whole course in one table. Always raise modularity before distributing. Smallest architecture that removes the pain wins.</p></aside>
   </section>
 
-  <!-- 41 · AI -->
+  <!-- 42 · AI -->
   <section class="slide">
     <div class="kicker">07 · Modern angle</div>
     <h2 class="ai">Architecture &amp; AI</h2>
@@ -1247,7 +1316,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Modern angle</div><p>Fundamentals grow more important with AI. Context engineering: ADRs, specs, boundaries feed agents. Boundary rules are the guardrails on the next lint. Aim for just-enough architecture, not full spec-driven.</p></aside>
   </section>
 
-  <!-- 42 · REFERENCE IMPL -->
+  <!-- 43 · REFERENCE IMPL -->
   <section class="slide">
     <div class="kicker">Reference implementation</div>
     <h2>All three stages, one repo</h2>
@@ -1268,7 +1337,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Reference implementation</div><p>Built for real: app-shell composes catalog + orders at build time and loads analytics at runtime via Module Federation. Offer a live walkthrough.</p></aside>
   </section>
 
-  <!-- 43 · REPOS -->
+  <!-- 44 · REPOS -->
   <section class="slide">
     <div class="kicker">Explore the code</div>
     <h2>It's all on GitHub</h2>
@@ -1280,7 +1349,144 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <aside class="notes"><div class="t">Explore the code</div><p>Index repo carries the C4 diagrams; commerceos carries the enforced code; the staged repos mirror the progression.</p></aside>
   </section>
 
-  <!-- 44 · CLOSE -->
+  <!-- 45 · WRAP-UP · FOUNDATIONS -->
+  <section class="slide">
+    <div class="kicker">Wrapping up</div>
+    <h2>Foundations</h2>
+    <style>.wrapgrid{display:grid; grid-template-columns:1.3fr .8fr; gap:36px; align-items:center; width:100%; max-width:1200px; margin-top:6px}
+      .wrapgrid .plist{max-width:none; margin-top:0}
+      .wrapgrid .plist li{padding:9px 0 9px 38px; font:600 min(2.05vw,22px)/1.35 var(--sans)}
+      .wrapgrid .plist li::before{top:9px; color:var(--coral)}
+      .wrapgrid .fig{margin:0; width:100%}
+      @media (max-width:900px){.wrapgrid{grid-template-columns:1fr}}</style>
+    <div class="wrapgrid">
+      <ul class="plist">
+        <li class="frag">Architecture <b class="accent">==</b> Decisions</li>
+        <li class="frag">Architectural <b>drivers</b> influence your decisions</li>
+        <li class="frag">The <b>4 Pillars</b> framework describes any architecture</li>
+        <li class="frag">Architecture and <b class="ai">AI</b> are deeply interconnected</li>
+      </ul>
+      <div class="fig">
+        <svg viewBox="0 0 300 210" class="ink">
+          <g fill="none" stroke="#5a5346" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M18 74 L150 20 L282 74 Z"/>
+            <path d="M150 34 L150 74" stroke-width="1.4"/>
+            <path d="M10 74 L290 74"/><path d="M14 86 L286 86"/>
+            <g stroke-width="2">
+              <path d="M44 86 L44 168 M78 86 L78 168"/><path d="M38 168 L84 168"/>
+              <path d="M104 86 L104 168 M138 86 L138 168"/><path d="M98 168 L144 168"/>
+              <path d="M164 86 L164 168 M198 86 L198 168"/><path d="M158 168 L204 168"/>
+              <path d="M224 86 L224 168 M258 86 L258 168"/><path d="M218 168 L264 168"/>
+            </g>
+            <g stroke-width="1.2" opacity=".55">
+              <path d="M61 92 L61 162"/><path d="M121 92 L121 162"/><path d="M181 92 L181 162"/><path d="M241 92 L241 162"/>
+            </g>
+            <path d="M16 178 L284 178"/><path d="M8 190 L292 190"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes"><div class="t">Recap 1 of 4 — the vocabulary</div><p>Everything that followed rests on these. <b>Architecture is decisions</b>, specifically the ones expensive to change later — not folders, not frameworks. Those decisions come from <b>drivers</b>: business goals, quality attributes, constraints, functional requirements, team experience, tech trends. The <b>4 pillars</b> — style, characteristics, decisions, components — are how you describe any architecture, which is exactly what the two Character Sheets did. And <b>AI</b> raises the value of all of it: boundaries are guardrails for agents, ADRs and specs are their context, and judgment is the part that doesn't automate.</p></aside>
+  </section>
+
+  <!-- 46 · WRAP-UP · MONOLITHS -->
+  <section class="slide">
+    <div class="kicker">Wrapping up</div>
+    <h2>Monoliths</h2>
+    <div class="wrapgrid">
+      <ul class="plist">
+        <li class="frag">All monoliths naturally evolve into <b class="r">Big Balls of Mud</b></li>
+        <li class="frag">Avoid the <b class="r">distributed</b> big ball of mud at all cost — raise modularity <b>before</b> adding deployment units</li>
+        <li class="frag"><b>Modular monoliths</b> scale a monolith a long way before you need micro-frontends</li>
+        <li class="frag">Modularity <b class="accent">=</b> Organization <b class="accent">+</b> Encapsulation</li>
+      </ul>
+      <div class="fig">
+        <svg viewBox="0 0 300 226">
+          <g font-family="var(--mono)" font-size="11.5" font-weight="700" text-anchor="middle">
+            <rect class="hn" x="26" y="8" width="248" height="38" rx="8" fill="#fbe7e2" stroke="#df5b45" stroke-width="1.6"/><text x="150" y="32" fill="#20242e">PRESENTATION</text>
+            <rect class="hn" x="26" y="66" width="248" height="38" rx="8" fill="#f6ecd7" stroke="#b07d1a" stroke-width="1.6"/><text x="150" y="90" fill="#20242e">BUSINESS</text>
+            <rect class="hn" x="26" y="124" width="248" height="38" rx="8" fill="#eef0dd" stroke="#6f7d3f" stroke-width="1.6"/><text x="150" y="148" fill="#20242e">PERSISTENCE</text>
+            <rect class="hn" x="26" y="182" width="248" height="38" rx="8" fill="#f2e6ea" stroke="#8a5a6a" stroke-width="1.6"/><text x="150" y="206" fill="#20242e">DATABASE</text>
+          </g>
+          <g stroke="#b6ac96" stroke-width="1.8" fill="none" marker-end="url(#awl)">
+            <path class="draw" pathLength="1" d="M150 48 L150 62"/>
+            <path class="draw" pathLength="1" d="M150 106 L150 120" style="animation-delay:.12s"/>
+            <path class="draw" pathLength="1" d="M150 164 L150 178" style="animation-delay:.24s"/>
+          </g>
+          <defs><marker id="awl" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#b6ac96"/></marker></defs>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes"><div class="t">Recap 2 of 4 — stage 1</div><p>Entropy is the default: without enforced boundaries every monolith drifts into a big ball of mud. The one rule to carry out of the room is the second bullet — <b>modularity before distribution</b>. Add deployment units to a mess and you get a distributed big ball of mud, which is strictly worse than what you started with because now the mess has network calls in it.</p><p>A modular monolith gets you remarkably far, and it's cheap: folders by subdomain plus lint rules. And modularity is two halves — <b>organization</b> (where code lives) and <b>encapsulation</b> (what may reach it). Teams do the first and skip the second, then wonder why the boundaries didn't hold.</p></aside>
+  </section>
+
+  <!-- 47 · WRAP-UP · MONOREPOS -->
+  <section class="slide">
+    <div class="kicker">Wrapping up</div>
+    <h2>Monorepos</h2>
+    <div class="wrapgrid">
+      <ul class="plist">
+        <li class="frag">Use monorepos to <b>scale</b> modular monoliths</li>
+        <li class="frag">Three steps: <b class="arch">bring it together</b> → <b class="arch">break it apart</b> → <b class="arch">make it scale</b></li>
+        <li class="frag">Adopt tooling for <b>distributed caching</b> and <b>task orchestration</b></li>
+        <li class="frag">Pants has the best logo</li>
+      </ul>
+      <div class="fig">
+        <svg viewBox="0 0 300 214">
+          <g font-family="var(--mono)" font-size="10.5" font-weight="700" text-anchor="middle">
+            <rect class="hn" x="6" y="88" width="82" height="36" rx="8" fill="#f5e3d9" stroke="#c94b34" stroke-width="1.6"/><text x="47" y="110" fill="#20242e">MONOLITH</text>
+            <rect x="128" y="6" width="166" height="202" rx="10" fill="none" stroke="#cfc7b3" stroke-dasharray="6 5"/>
+            <g fill="#f4f1e8" stroke="#6f7d3f" stroke-width="1.4">
+              <rect class="hn" x="146" y="18" width="130" height="30" rx="7"/><rect class="hn" x="146" y="60" width="130" height="30" rx="7"/>
+            </g>
+            <g fill="#f4f1e8" stroke="#8a5a6a" stroke-width="1.4">
+              <rect class="hn" x="146" y="124" width="130" height="30" rx="7"/><rect class="hn" x="146" y="166" width="130" height="30" rx="7"/>
+            </g>
+            <g fill="#20242e"><text x="211" y="37">APP 1</text><text x="211" y="79">APP 2</text></g>
+            <g fill="#8a5a6a"><text x="211" y="143">PACKAGE 1</text><text x="211" y="185">PACKAGE 2</text></g>
+          </g>
+          <g stroke="#c7bda6" stroke-width="1.6" fill="none" marker-end="url(#awm)">
+            <path class="draw" pathLength="1" d="M90 100 C 118 70, 122 44, 142 33"/>
+            <path class="draw" pathLength="1" d="M90 104 C 116 96, 124 80, 142 75" style="animation-delay:.1s"/>
+            <path class="draw" pathLength="1" d="M90 112 C 116 122, 124 132, 142 139" style="animation-delay:.2s"/>
+            <path class="draw" pathLength="1" d="M90 116 C 118 146, 122 170, 142 181" style="animation-delay:.3s"/>
+          </g>
+          <defs><marker id="awm" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#c7bda6"/></marker></defs>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes"><div class="t">Recap 3 of 4 — stage 2</div><p>A monorepo is not an architecture — it's the packaging that lets a modular monolith keep growing. The three steps are independent and you can stop after any of them: bring the repos together, break the modules into packages, then add tooling. Tooling comes <b>last</b>, once there's a graph worth orchestrating; adopting Turborepo with two packages is complexity you didn't need.</p><p>And yes — end on the Pants joke. It's a real build system, it does have the best logo, and a laugh right before the micro-frontends recap buys you attention for the serious slide.</p></aside>
+  </section>
+
+  <!-- 48 · WRAP-UP · MICRO-FRONTENDS -->
+  <section class="slide">
+    <div class="kicker">Wrapping up</div>
+    <h2>Micro-Frontends</h2>
+    <div class="wrapgrid">
+      <ul class="plist">
+        <li class="frag">A <b>technical</b> solution to an <b class="accent">organizational</b> problem</li>
+        <li class="frag">They come in many flavors (unfortunately not strawberry)</li>
+        <li class="frag">Don't treat a micro-frontend as a <b>component</b></li>
+        <li class="frag">Adopt when the cost of <b>coordination</b> exceeds the cost of a <b>distributed</b> architecture</li>
+      </ul>
+      <div class="fig">
+        <svg viewBox="0 0 300 210">
+          <line x1="36" y1="176" x2="288" y2="176" stroke="#d8d2c2"/><line x1="36" y1="14" x2="36" y2="176" stroke="#d8d2c2"/>
+          <path class="draw" pathLength="1" d="M36 96 L286 62" fill="none" stroke="#df5b45" stroke-width="3"/>
+          <path class="draw" pathLength="1" d="M36 172 C 150 168, 214 138, 286 20" fill="none" stroke="#b07d1a" stroke-width="3" style="animation-delay:.25s"/>
+          <circle class="pop" cx="228" cy="70" r="7" fill="#6f7d3f"/>
+          <text x="228" y="96" text-anchor="middle" fill="#6f7d3f" font-size="11" font-weight="700">adopt here</text>
+          <text x="30" y="30" text-anchor="end" class="lbl b" transform="rotate(-90 30 30)">COST</text>
+          <text x="162" y="198" text-anchor="middle" class="lbl">TIME →</text>
+          <text x="286" y="52" text-anchor="end" class="lbl b" fill="#df5b45" font-size="10">distributed</text>
+          <text x="200" y="126" text-anchor="middle" class="lbl b" fill="#b07d1a" font-size="10">coordination</text>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes"><div class="t">Recap 4 of 4 — stage 3, and the whole talk</div><p>The first bullet is the sentence to leave them with: micro-frontends are a <b>technical solution to an organizational problem</b>. If teams aren't blocked on each other's deploys, there is no problem here to solve.</p><p>Flavors: DIY proxy, iframes, multi-zones, Module Federation — pick from the cheatsheet, not from fashion. "Don't treat them as components" is the mistake that undoes everything: a component is about <i>reuse</i>, a micro-frontend is about <i>independence</i>; the moment you pass twelve props into a remote you've rebuilt the monolith over the network.</p><p>And the graph is the decision rule. Coordination cost in a monolith grows superlinearly with teams; distributed-system cost starts higher but grows slowly. Adopt at the crossover — not before, and be honest that you'll know it by measurement, not by vibe.</p></aside>
+  </section>
+
+  <!-- 49 · CLOSE -->
   <section class="slide" style="justify-content:center">
     <div class="kicker">Close</div>
     <h2 style="max-width:24ch">Your turn</h2>
