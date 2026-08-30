@@ -187,11 +187,24 @@
     font:600 12.5px/1 var(--mono); letter-spacing:1.6px; color:var(--grey3)}
   .cx-page b{color:#94A3B8; font-weight:700}
 
+  /* An image is the one element that will happily grow past the slide. Cap it against
+     the chrome band so a screenshot can never slide under the module chip or push its
+     own caption off the bottom. Aspect ratio is preserved by letting width follow. */
+  .slide img{max-height:calc(100vh - 230px); width:auto; max-width:100%}
+
   /* Titles carry no rule or underline — contrast does the work. */
   h1,h2,h3,.big{border-bottom:none !important; text-decoration:none !important}
 
   /* ---- deck chrome that would collide with the brand chrome ----------------------- */
-  #navToggle{top:auto !important; bottom:18px; left:18px}
+  /* The slide menu sits directly under the module chip, sharing its left edge and its
+     type scale, so the two read as one stack of chrome instead of two loose buttons at
+     opposite corners. Kept small deliberately: it lives in the band above the content,
+     and .slide's minimum top padding is what keeps it clear of the first line. */
+  #navToggle{top:56px !important; bottom:auto !important; left:34px !important;
+    font:700 11px/1 var(--mono) !important; letter-spacing:1.3px; padding:6px 12px !important;
+    border-radius:999px !important; border:1px solid var(--line2) !important;
+    background:var(--panel2) !important; color:var(--grey3) !important; opacity:1}
+  #navToggle:hover{color:var(--cy); border-color:var(--cy) !important}
   #codeToggle{right:112px !important; bottom:16px !important}
   #dots{bottom:20px}
   #bar{background:var(--cy)}
@@ -213,6 +226,9 @@
     html,body{background:#070A14 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
     .slide{position:relative !important; border-bottom:1px solid #1E293B !important}
     .cx-logo,.cx-chip,.cx-page{position:absolute !important}
+    /* Presenter controls are not part of the deck. Now that the slide menu sits beside
+       the chip, leaving it in would stamp it on every printed page. */
+    #navToggle,#nav,#scrim,#codeToggle{display:none !important}
   }
 </style>
 <!--/catalyst-brand:style-->
@@ -612,7 +628,7 @@
     <div class="kicker">03 → 04 · Scorecard</div>
     <h2>Growing Pains, <span class="accent">revisited</span></h2>
     <style>.gp{margin-top:6px}
-      .gp li{padding:4px 0 4px 42px}
+      .gp li{padding:3px 0 3px 42px}
       .gp li::before{top:8px}
       .gp li.done{color:var(--muted); font-weight:600}
       .gp li.done>span{text-decoration:line-through; text-decoration-thickness:2px; text-decoration-color:#64748B}
@@ -1152,7 +1168,7 @@ Time:      <span class="w">20ms</span> <span class="r">&gt;&gt;&gt; FULL TURBO</
     <div class="kicker">05 · Stage 3 · Pick one</div>
     <h2>Micro-Frontends Cheatsheet</h2>
     <style>.cheat li b.ans{color:var(--coral)}
-      .cheat li{padding:4px 0 4px 40px}
+      .cheat li{padding:3px 0 3px 40px}
       .cheat li::before{top:8px}</style>
     <ul class="plist cheat" style="max-width:none; margin-top:8px">
       <li class="frag">If a <b>vertical split</b> is enough → <b class="ans">DIY route-based orchestration</b><small>a proxy in front of separately deployed apps — no framework at all</small></li>
