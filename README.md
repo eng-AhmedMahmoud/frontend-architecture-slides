@@ -14,9 +14,15 @@ The 30-minute lesson: Monoliths → Monorepos → Micro-Frontends.
 Edit **`index.notes.html`** — it is the source of truth. Then:
 
 ```sh
-python3 build.py          # regenerate index.html
-python3 build.py --check  # verify index.html is in sync (exit 1 if stale)
+python3 ../../brand/apply_brand.py   # re-stamp Catalyst chrome + page numbers
+python3 build.py                     # regenerate index.html
+python3 build.py --check             # verify index.html is in sync (exit 1 if stale)
 ```
+
+The deck uses the Catalyst brand system — dark palette, Trebuchet/Calibri/Consolas, logo
+top-right, `MODULE X · VIDEO Y` chip top-left, page number bottom-right. The spec is
+`brand/catalyst-brand.md` at the repo root; do not hand-edit the generated
+`<style id="catalyst-brand">` block or the `<!--catalyst-brand:chrome-->` spans.
 
 The build strips every `<aside class="notes">` block, drops the `S` hint from the
 footer, and disables the notes toggle, so the published deck carries no speaker
