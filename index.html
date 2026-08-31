@@ -196,15 +196,11 @@
   h1,h2,h3,.big{border-bottom:none !important; text-decoration:none !important}
 
   /* ---- deck chrome that would collide with the brand chrome ----------------------- */
-  /* The slide menu sits directly under the module chip, sharing its left edge and its
-     type scale, so the two read as one stack of chrome instead of two loose buttons at
-     opposite corners. Kept small deliberately: it lives in the band above the content,
-     and .slide's minimum top padding is what keeps it clear of the first line. */
-  #navToggle{top:56px !important; bottom:auto !important; left:34px !important;
-    font:700 11px/1 var(--mono) !important; letter-spacing:1.3px; padding:6px 12px !important;
-    border-radius:999px !important; border:1px solid var(--line2) !important;
-    background:var(--panel2) !important; color:var(--grey3) !important; opacity:1}
-  #navToggle:hover{color:var(--cy); border-color:var(--cy) !important}
+  /* The slide menu stays in the bottom-left corner, but it sits *below* both panels in
+     the stacking order: open the slide list or the speaker notes and the panel simply
+     covers it. Nothing to toggle, nothing to animate — the button is behind the thing
+     that replaced it. #notes is z-index 20 and #nav is 30, so 19 puts it under both. */
+  #navToggle{top:auto !important; bottom:18px !important; left:18px !important; z-index:19 !important}
   #codeToggle{right:112px !important; bottom:16px !important}
   #dots{bottom:20px}
   #bar{background:var(--cy)}
